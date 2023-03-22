@@ -9,7 +9,7 @@ const tripsRouter = require('./routes/trips');
 const app = express();
 const port = 3000;
 
-const isDebug = true
+const isDebug = false
 
 let mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/?retryWrites=true&w=majority'
 if (isDebug) {
