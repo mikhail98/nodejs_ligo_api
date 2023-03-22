@@ -9,7 +9,7 @@ const tripsRouter = require('./routes/trips');
 const app = express();
 const port = 3000;
 
-mongoose.connect('mongodb://localhost:27017/pingo', {
+mongoose.connect('mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
