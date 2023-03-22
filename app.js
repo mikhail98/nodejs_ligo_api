@@ -10,21 +10,21 @@ const defaultRouter = require('./routes/default');
 const app = express();
 const port = process.env.PORT || 80;
 
-// const isDebug = false
-//
-// let mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/?retryWrites=true&w=majority'
-// if (isDebug) {
-//     mongoUrl = 'mongodb://localhost:27017/pingo'
-// }
-//
-// mongoose.connect(mongoUrl, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// })
-//     .then(() => console.log('MongoDB Connected'))
-//     .catch((error) => {
-//         console.error('MongoDB Connection Error:', error);
-//     });
+const isDebug = false
+
+let mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/?retryWrites=true&w=majority'
+if (isDebug) {
+    mongoUrl = 'mongodb://localhost:27017/pingo'
+}
+
+mongoose.connect(mongoUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => console.log('MongoDB Connected'))
+    .catch((error) => {
+        console.error('MongoDB Connection Error:', error);
+    });
 
 app.use(bodyParser.json());
 app.use('/', defaultRouter);
