@@ -10,12 +10,7 @@ const defaultRouter = require('./routes/default');
 const app = express();
 const port = process.env.PORT || 80;
 
-const isDebug = false
-
-let mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/?retryWrites=true&w=majority'
-if (isDebug) {
-    mongoUrl = 'mongodb://localhost:27017/pingo'
-}
+const mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/pingo?retryWrites=true&w=majority'
 
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
