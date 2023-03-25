@@ -10,6 +10,8 @@ const defaultRouter = require('./routes/default');
 const app = express();
 const port = process.env.PORT || 80;
 
+const io = require("socket.io")(8080);
+
 const mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/pingo?retryWrites=true&w=majority'
 
 mongoose.connect(mongoUrl, {
@@ -27,6 +29,9 @@ app.use('/users', usersRouter);
 app.use('/trips', tripsRouter);
 app.use('/auth', authRouter);
 
+io.on('connection', (socket) => {
+    console.log('a user connected');
+});
 
 app.listen(port, () => {
     console.log(`Server has been started at port:${port}`);

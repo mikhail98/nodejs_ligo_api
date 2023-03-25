@@ -1,7 +1,6 @@
 {
   "name": "pingo_demo",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
@@ -17,6 +16,17 @@
     "express": "^4.18.2",
     "fcm-notification": "^2.0.0",
     "firebase-admin": "^11.5.0",
-    "mongoose": "^7.0.2"
-  }
+    "mongoose": "^7.0.2",
+    "socket.io": "^4.6.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikhail98/pingo_demo.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/mikhail98/pingo_demo/issues"
+  },
+  "homepage": "https://github.com/mikhail98/pingo_demo#readme",
+  "description": ""
 }
