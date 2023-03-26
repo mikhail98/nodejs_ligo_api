@@ -1,4 +1,7 @@
-const io = require("socket.io")(3000);
+const express = require('express');
+const http = require('http');
+const server = http.createServer(express());
+const io = require('socket.io')(server);
 
 let socketConnections = []
 
