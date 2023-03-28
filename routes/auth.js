@@ -8,8 +8,9 @@ router.post('/', async (req, res) => {
     try {
         const email = req.body["email"]
         const password = req.body["password"]
+        const fcmToken = req.body["fcmToken"]
 
-        const user = await User.findOne({email: email})
+        const user = await User.findOneAndUpdate({email: email}, {fcmToken: fcmToken})
 
         if (user === null) {
             res.status(404).send(Error.noSuchUser);

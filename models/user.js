@@ -20,12 +20,12 @@ const userSchema = new mongoose.Schema({
     isDriver: {
         type: Boolean,
         unique: false,
-        required: false,
+        required: true,
     },
     isActive: {
         type: Boolean,
         unique: false,
-        required: false,
+        required: true,
     },
     location: {
         type: pointSchema,
