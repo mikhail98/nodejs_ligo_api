@@ -37,6 +37,16 @@ const userSchema = new mongoose.Schema({
         unique: false,
         required: false,
     },
+    isValidated: {
+        type: Boolean,
+        unique: false,
+        required: false,
+    },
+    passportPhotoUrl: {
+        type: String,
+        unique: false,
+        required: false,
+    },
 });
 
 const User = mongoose.model('User', userSchema);

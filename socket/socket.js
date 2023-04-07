@@ -1,39 +1,37 @@
-const express = require('express');
-const http = require('http');
-const server = http.createServer(express());
-const io = require('socket.io')(server);
+const io = require('socket.io');
 
-let socketConnections = []
+const socketConnections = [];
 
-function init(callback) {
-    io.on('connection', (socket) => {
+function initSocket(server) {
+    const socketServer = new io.Server(server);
+
+    socketServer.on('connection', (socket) => {
         socket.on('enterSocket', userId => {
-            callback(userId)
-            const socketInstance = {socket: socket, _id: userId}
+            const socketInstance = { socket: socket, _id: userId };
 
-            const connection = socketConnections.find(si => si._id === userId)
-            if (connection != null) {
-                socketConnections.splice(socketConnections.indexOf(connection))
+            const connection = socketConnections.find(si => si._id === userId);
+
+            if (connection !== null) {
+                socketConnections.splice(socketConnections.indexOf(connection));
             }
 
             socketConnections.push(socketInstance);
-            addListeners(socketInstance)
+
+            emitEvent(userId, "socketEntered", { isSuccess: true})
         });
     });
 }
 
-function addListeners(socketInstance) {
-    const socket = socketInstance.socket
-    socket.on('test', (data) => {
-        emitEvent(socketInstance._id, 'newTripRequested', "sadf");
-    });
-}
-
 function emitEvent(userId, eventName, data) {
-    const socket = socketConnections.find(connection => connection._id === userId).socket;
-    socket.emit(eventName, data);
+    const socketConnection = socketConnections.find(connection => connection._id === userId);
+
+    if (!socketConnection) {
+        return;
+    }
+
+    socketConnection.socket.emit(eventName, data);
 }
 
 module.exports = {
-    init, emitEvent
+    initSocket, emitEvent
 }

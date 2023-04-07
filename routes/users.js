@@ -8,6 +8,11 @@ const router = express.Router();
 router.post('/', async (req, res) => {
     try {
         const user = new User(req.body);
+
+        const isDriver = req.body["isDriver"]
+        if (isDriver) {
+            req.body["isValidated"] = false
+        }
         await user.save();
         res.status(200).send(user);
     } catch (error) {
@@ -52,7 +57,7 @@ router.patch('/:id/status', async (req, res) => {
     const driverId = req.params.id
     const user = await User.findOneAndUpdate({_id: req.params.id}, {isActive: isActive})
 
-    if(!isActive) {
+    if (!isActive) {
         await Trip.findOneAndRemove({driver: driverId})
     }
 
@@ -67,6 +72,30 @@ router.patch('/:id/status', async (req, res) => {
 
 router.patch('/:id/fcmToken', async (req, res) => {
     const user = await User.findOneAndUpdate({_id: req.params.id}, {fcmToken: req.body["fcmToken"]})
+
+    if (user === null) {
+        res.status(404).send(Error.noSuchUser);
+    } else {
+        const user = await User.findOne({_id: req.params.id})
+        user.password = null
+        res.status(200).send(user);
+    }
+});
+
+router.patch('/:id/passportPhoto', async (req, res) => {
+    const user = await User.findOneAndUpdate({_id: req.params.id}, {passportPhotoUrl: req.body["passportPhotoUrl"]})
+
+    if (user === null) {
+        res.status(404).send(Error.noSuchUser);
+    } else {
+        const user = await User.findOne({_id: req.params.id})
+        user.password = null
+        res.status(200).send(user);
+    }
+});
+
+router.patch('/:id/validate', async (req, res) => {
+    const user = await User.findOneAndUpdate({_id: req.params.id}, {isValidated: req.body["isValidated"]})
 
     if (user === null) {
         res.status(404).send(Error.noSuchUser);
