@@ -9,10 +9,7 @@ router.post('/', async (req, res) => {
     try {
         const user = new User(req.body);
 
-        const isDriver = req.body["isDriver"]
-        if (isDriver) {
-            req.body["isValidated"] = false
-        }
+        req.body["isValidated"] = !req.body["isDriver"]
         await user.save();
         res.status(200).send(user);
     } catch (error) {
