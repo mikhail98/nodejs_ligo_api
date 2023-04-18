@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const Error = require('../errors/errors');
 const jwt = require("jsonwebtoken");
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.post('/', async (req, res) => {
                     {email_id: user.email}, "LigoTokenKey", {}
                 )
                 user.password = null
-                res.status(201).send(user);
+                res.status(200).send(user);
             } else {
                 res.status(400).send(Error.wrongPassword);
             }
@@ -27,6 +28,14 @@ router.post('/', async (req, res) => {
     } catch (error) {
         res.status(400).send(error);
     }
+});
+
+router.post('/:id/logout', auth, async (req, res) => {
+    const user = await User.findOneAndUpdate({_id: req.params.id}, {isActive: false, fcmToken: null,});
+    if(user === null) {
+        res.status(404).send(Error.noSuchUser);
+    }
+    return res.status(200).send();
 });
 
 module.exports = router;

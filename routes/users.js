@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
     try {
-        const {name, email, password, isDriver, isActive, fcmToken} = req.body;
+        const {name, email, password, isDriver, isActive, fcmToken, passportPhotoUrl} = req.body;
 
         const oldUser = await User.findOne({email});
 
@@ -26,7 +26,8 @@ router.post('/', async (req, res) => {
             isDriver: isDriver,
             isActive: isActive,
             isValidated: !isDriver,
-            fcmToken: fcmToken
+            fcmToken: fcmToken,
+            passportPhotoUrl: passportPhotoUrl
         });
         user.token = jwt.sign(
             {email_id: user.email}, "LigoTokenKey", {}
