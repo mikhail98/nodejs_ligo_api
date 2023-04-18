@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema({
         unique: false,
         required: false,
     },
+    token: {
+        type: String,
+        unique: false,
+        required: false,
+    },
 });
 
 const User = mongoose.model('User', userSchema);

@@ -1,21 +1,24 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const Error = require('../errors/errors');
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
 router.post('/', async (req, res) => {
     try {
-        const email = req.body["email"]
-        const password = req.body["password"]
-        const fcmToken = req.body["fcmToken"]
-
-        const user = await User.findOneAndUpdate({email: email}, {fcmToken: fcmToken})
+        const {email, password, fcmToken} = req.body;
+        const user = await User.findOneAndUpdate({email}, {fcmToken})
 
         if (user === null) {
             res.status(404).send(Error.noSuchUser);
         } else {
-            if (user.password === password) {
+            if (await bcrypt.compare(password, user.password)) {
+                user.token = jwt.sign(
+                    {email_id: user.email}, "LigoTokenKey", {}
+                )
+                user.password = null
                 res.status(201).send(user);
             } else {
                 res.status(400).send(Error.wrongPassword);
