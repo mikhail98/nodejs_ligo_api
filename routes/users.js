@@ -27,7 +27,8 @@ router.post('/', async (req, res) => {
             isActive: isActive,
             isValidated: !isDriver,
             fcmToken: fcmToken,
-            passportPhotoUrl: passportPhotoUrl
+            passportPhotoUrl: passportPhotoUrl,
+            isAdmin: false
         });
         user.token = jwt.sign(
             {email_id: user.email}, "LigoTokenKey", {}
@@ -124,6 +125,11 @@ router.patch('/:id/passportPhoto', auth, async (req, res) => {
 });
 
 router.patch('/:id/validate', auth, async (req, res) => {
+    const validatorEmail = req.user.email_id;
+    const validator = await User.findOne({email: validatorEmail})
+    if (validator.isAdmin === false) {
+        return res.status(403).send(Error.youNeedAdminRights);
+    }
     const user = await User.findOne({_id: req.params.id})
 
     if (user === null) {

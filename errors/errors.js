@@ -5,6 +5,7 @@ const notADriver = createError("Not a driver")
 const requiredToken = createError("Token is required")
 const invalidToken = createError("Invalid token")
 const pointsAreTheSame = createError("startPoint can't be equal to endPoint")
+const youNeedAdminRights = createError("You need to be an admin to do that")
 
 function createError(msg) {
     return {
@@ -13,5 +14,5 @@ function createError(msg) {
 }
 
 module.exports = {
-    wrongPassword, noSuchUser, pointsAreTheSame, notADriver, userExits, requiredToken, invalidToken
+    wrongPassword, noSuchUser, pointsAreTheSame, notADriver, userExits, requiredToken, invalidToken, youNeedAdminRights
 }
