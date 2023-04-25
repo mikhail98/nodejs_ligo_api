@@ -1,16 +1,16 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const express = require('express')
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
 
-const usersRouter = require('./routes/users');
-const authRouter = require('./routes/auth');
-const tripsRouter = require('./routes/trips');
-const defaultRouter = require('./routes/default');
+const usersRouter = require('./routes/users')
+const authRouter = require('./routes/auth')
+const tripsRouter = require('./routes/trips')
+const defaultRouter = require('./routes/default')
 
-const app = express();
-const port = process.env.PORT || 80;
+const app = express()
+const port = process.env.PORT || 80
 
-const { initSocket } = require('./socket/socket');
+const { initSocket } = require('./socket/socket')
 
 const mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/pingo?retryWrites=true&w=majority'
 
@@ -20,17 +20,17 @@ mongoose.connect(mongoUrl, {
 })
     .then(() => console.log('MongoDB Connected'))
     .catch((error) => {
-        console.error('MongoDB Connection Error:', error);
-    });
+        console.error('MongoDB Connection Error:', error)
+    })
 
-app.use(bodyParser.json());
-app.use('/', defaultRouter);
-app.use('/users', usersRouter);
-app.use('/trips', tripsRouter);
-app.use('/auth', authRouter);
+app.use(bodyParser.json())
+app.use('/', defaultRouter)
+app.use('/users', usersRouter)
+app.use('/trips', tripsRouter)
+app.use('/auth', authRouter)
 
 const server = app.listen(port, () => {
-    console.log(`Server has been started at port: ${port}`);
-});
+    console.log(`Server has been started at port: ${port}`)
+})
 
-initSocket(server);
+initSocket(server)

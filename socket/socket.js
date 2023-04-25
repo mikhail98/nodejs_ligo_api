@@ -1,35 +1,41 @@
-const io = require('socket.io');
+const io = require('socket.io')
 
-const socketConnections = [];
+const socketConnections = []
 
 function initSocket(server) {
-    const socketServer = new io.Server(server);
+    const socketServer = new io.Server(server)
 
-    socketServer.on('connection', (socket) => {
-        socket.on('enterSocket', userId => {
-            const socketInstance = { socket: socket, _id: userId };
+    socketServer.on('connection', socket => {
+        socket.on('enterSocket', (data) => {
 
-            const connection = socketConnections.find(si => si._id === userId);
+            const userId = data.userId
+            const socketInstance = { socket: socket, _id: userId }
+
+            const connection = socketConnections.find(si => si._id === userId)
 
             if (connection !== null) {
-                socketConnections.splice(socketConnections.indexOf(connection));
+                socketConnections.splice(socketConnections.indexOf(connection))
             }
 
-            socketConnections.push(socketInstance);
+            socketConnections.push(socketInstance)
 
             emitEvent(userId, "socketEntered", { isSuccess: true})
-        });
-    });
+        })
+    })
 }
 
 function emitEvent(userId, eventName, data) {
-    const socketConnection = socketConnections.find(connection => connection._id === userId);
+    const socketConnection = socketConnections.find(connection => connection._id === userId)
+
+    console.log(socketConnections.map(connection => connection._id))
 
     if (!socketConnection) {
-        return;
+        return
     }
 
-    socketConnection.socket.emit(eventName, data);
+    console.log("emmited " + eventName + " to " + userId)
+
+    socketConnection.socket.emit(eventName, data)
 }
 
 module.exports = {

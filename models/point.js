@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const pointSchema = new mongoose.Schema({
     latitude: {
@@ -16,9 +16,9 @@ const pointSchema = new mongoose.Schema({
         unique: false,
         required: false,
     }
-});
+})
 
-const Point = mongoose.model('Point', pointSchema);
+const Point = mongoose.model('Point', pointSchema)
 
 module.exports = {
     Point, pointSchema

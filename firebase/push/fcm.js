@@ -1,8 +1,8 @@
-const admin = require("firebase-admin");
-const FCM = require('fcm-notification');
-var serviceAccount = require("./pingo-demo-private-key.json");
-const certPath = admin.credential.cert(serviceAccount);
-const FCMClient = new FCM(certPath);
+const admin = require("firebase-admin")
+const FCM = require('fcm-notification')
+var serviceAccount = require("./pingo-demo-private-key.json")
+const certPath = admin.credential.cert(serviceAccount)
+const FCMClient = new FCM(certPath)
 
 function sendPushNotification(fcmToken, title, body) {
     try {
@@ -18,19 +18,19 @@ function sendPushNotification(fcmToken, title, body) {
                 },
             },
             token: fcmToken
-        };
+        }
 
         FCMClient.send(message, function (error, resp) {
             if (error) {
-                console.error('Notification sent unsuccessfully:', error);
+                console.error('Notification sent unsuccessfully:', error)
             } else {
-                console.log('Successfully sent notification');
+                console.log('Successfully sent notification')
             }
-        });
+        })
 
     } catch (error) {
-        console.error('Notification sent unsuccessfully:', error);
+        console.error('Notification sent unsuccessfully:', error)
     }
 }
 
- module.exports = sendPushNotification;
+ module.exports = sendPushNotification
