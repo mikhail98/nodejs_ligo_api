@@ -6,6 +6,7 @@ const Trip = require('../models/trip')
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const socket = require('../socket/socket')
+const sendPush = require('../firebase/push/fcm')
 
 const router = express.Router()
 
@@ -143,6 +144,12 @@ router.patch('/:id/validate', auth, async (req, res) => {
             await User.findOneAndUpdate({_id: req.params.id}, {isValidated})
             const responseUser = await User.findOne({_id: req.params.id})
             socket.emitEvent(responseUser._id.toString(), "userValidated", {isValidated})
+            if (responseUser.fcmToken) {
+                sendPush(responseUser.fcmToken, {
+                    key: "USER_VALIDATED",
+                    isValidated: isValidated.toString()
+                })
+            }
             responseUser.password = null
             res.status(200).send(responseUser)
         }

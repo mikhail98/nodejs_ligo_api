@@ -1,21 +1,14 @@
 const admin = require("firebase-admin")
 const FCM = require('fcm-notification')
-var serviceAccount = require("./pingo-demo-private-key.json")
+const serviceAccount = require("./pingo-demo-private-key.json")
 const certPath = admin.credential.cert(serviceAccount)
 const FCMClient = new FCM(certPath)
 
-function sendPushNotification(fcmToken, title, body) {
+function sendPushNotification(fcmToken, data) {
     try {
         let message = {
             android: {
-                notification: {
-                    title: title,
-                    body: body,
-                },
-                data: {
-                    title: title,
-                    body: body,
-                },
+                data: data,
             },
             token: fcmToken
         }
@@ -33,4 +26,4 @@ function sendPushNotification(fcmToken, title, body) {
     }
 }
 
- module.exports = sendPushNotification
+module.exports = sendPushNotification
