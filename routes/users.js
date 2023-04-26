@@ -13,7 +13,7 @@ const router = express.Router()
 //create user
 router.post('/', async (req, res) => {
     try {
-        const {name, email, password, isDriver, isActive, fcmToken, passportPhotoUrl} = req.body
+        const {name, email, password, isDriver, isActive, fcmToken, passportPhotoUrl, avatarUrl} = req.body
 
         const oldUser = await User.findOne({email})
 
@@ -31,6 +31,7 @@ router.post('/', async (req, res) => {
             isValidated: !isDriver,
             fcmToken: fcmToken,
             passportPhotoUrl: passportPhotoUrl,
+            avatarUrl: avatarUrl,
             isAdmin: false
         })
         user.token = jwt.sign(
@@ -126,6 +127,18 @@ router.patch('/:id/fcmToken', auth, async (req, res) => {
 router.patch('/:id/passportPhoto', auth, async (req, res) => {
     const _id = req.params.id
     const user = await User.findOneAndUpdate({_id}, {passportPhotoUrl: req.body["passportPhotoUrl"]})
+
+    if (user === null) {
+        res.status(404).send(Error.noSuchUser)
+    } else {
+        res.status(201).send()
+    }
+})
+
+//update user фмфефк
+router.patch('/:id/avatar', auth, async (req, res) => {
+    const _id = req.params.id
+    const user = await User.findOneAndUpdate({_id}, {avatarUrl: req.body["avatarUrl"]})
 
     if (user === null) {
         res.status(404).send(Error.noSuchUser)

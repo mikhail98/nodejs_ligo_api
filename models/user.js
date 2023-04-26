@@ -47,6 +47,11 @@ const userSchema = new mongoose.Schema({
         unique: false,
         required: false,
     },
+    avatarUrl: {
+        type: String,
+        unique: false,
+        required: false,
+    },
     isAdmin: {
         type: Boolean,
         unique: false,
