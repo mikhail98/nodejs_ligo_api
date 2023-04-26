@@ -10,7 +10,7 @@ const defaultRouter = require('./routes/default')
 const app = express()
 const port = process.env.PORT || 80
 
-const { initSocket } = require('./socket/socket')
+const socket = require('./socket/socket')
 
 const mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/pingo?retryWrites=true&w=majority'
 
@@ -38,4 +38,4 @@ const server = app.listen(port, () => {
     console.log(`Server has been started at port: ${port}`)
 })
 
-initSocket(server)
+socket.initSocket(server)

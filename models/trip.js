@@ -1,7 +1,13 @@
 const mongoose = require('mongoose')
 const pointSchema = require('../models/point').pointSchema
+const parcelSchema = require('../models/parcel').parcelSchema
 
 const tripSchema = new mongoose.Schema({
+    driver: {
+        type: String,
+        unique: false,
+        required: true,
+    },
     startPoint: {
         type: pointSchema,
         unique: false,
@@ -12,11 +18,22 @@ const tripSchema = new mongoose.Schema({
         unique: false,
         required: true,
     },
-    driver: {
-        type: String,
+    driverLocation: {
+        type: pointSchema,
         unique: false,
         required: true,
     },
+    status: {
+        type: String,
+        enum: ['ACTIVE', 'COMPLETED'],
+        unique: false,
+        required: true
+    },
+    parcels: [{
+        type: parcelSchema,
+        unique: false,
+        required: false,
+    }]
 }, {timestamps: true})
 
 const Trip = mongoose.model('Trip', tripSchema)
