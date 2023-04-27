@@ -20,6 +20,4 @@ const pointSchema = new mongoose.Schema({
 
 const Point = mongoose.model('Point', pointSchema)
 
-module.exports = {
-    Point, pointSchema
-}
+module.exports = pointSchema

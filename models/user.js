@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
-const pointSchema = require('../models/point').pointSchema
+const pointSchema = require('../models/point')
+const ratingSchema = require('../models/rating')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -16,6 +17,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         unique: false,
         required: true,
+    },
+    phone: {
+        type: String,
+        unique: false,
+        required: false,
     },
     isDriver: {
         type: Boolean,
@@ -57,6 +63,11 @@ const userSchema = new mongoose.Schema({
         unique: false,
         required: true,
     },
+    ratings: [{
+        type: ratingSchema,
+        unique: false,
+        required: false
+    }],
     token: {
         type: String,
         unique: false,

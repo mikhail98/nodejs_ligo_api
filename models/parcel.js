@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const {pointSchema} = require("../models/point");
+const pointSchema = require("../models/point")
 
 const parcelSchema = new mongoose.Schema({
     user: {
@@ -35,7 +35,7 @@ const parcelSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        enum: ['CREATED', 'ACCEPTED', 'DELIVERED'],
+        enum: ['CREATED', 'ACCEPTED', 'PICKED', 'DELIVERED', 'CANCELLED'],
         unique: false,
         required: true
     }

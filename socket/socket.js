@@ -2,7 +2,7 @@ const io = require('socket.io')
 const Trip = require('../models/trip')
 const {Parcel} = require('../models/parcel')
 const User = require('../models/user')
-const sendPushNotification = require("../firebase/push/fcm");
+const sendPushNotification = require("../firebase/push/fcm")
 
 const socketConnections = []
 
@@ -104,12 +104,21 @@ function deg2rad(deg) {
 }
 
 async function acceptParcel(driver, parcel) {
+    const existedParcel = await Parcel.findOne({_id: parcel._id})
+    if (!existedParcel) {
+        return
+    }
+    existedParcel.status = 'ACCEPTED'
+
     const trip = await Trip.findOne({driver})
     if (!trip) {
         return
     }
-    trip.parcels.push(parcel._id)
+    trip.parcels.push(existedParcel)
+
     await Trip.updateOne({driver}, trip)
+    await Parcel.updateOne({_id: parcel._id}, existedParcel)
+
     emitEvent(parcel.user.toString(), 'parcelAccepted', trip)
 }
 

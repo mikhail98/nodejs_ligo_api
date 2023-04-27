@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const pointSchema = require('../models/point').pointSchema
+const pointSchema = require('../models/point')
 const parcelSchema = require('../models/parcel').parcelSchema
 
 const tripSchema = new mongoose.Schema({
@@ -25,7 +25,7 @@ const tripSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['ACTIVE', 'COMPLETED'],
+        enum: ['ACTIVE', 'COMPLETED', 'CANCELLED'],
         unique: false,
         required: true
     },

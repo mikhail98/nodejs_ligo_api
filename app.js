@@ -30,7 +30,7 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", '*')
 
     next()
-});
+})
 app.use('/', defaultRouter)
 app.use('/users', usersRouter)
 app.use('/trips', tripsRouter)
