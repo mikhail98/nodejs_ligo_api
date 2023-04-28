@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const usersRouter = require('./routes/users')
 const authRouter = require('./routes/auth')
 const tripsRouter = require('./routes/trips')
+const parcelsRouter = require('./routes/parcels')
 const defaultRouter = require('./routes/default')
 
 const app = express()
@@ -35,6 +36,7 @@ app.use('/', defaultRouter)
 app.use('/users', usersRouter)
 app.use('/trips', tripsRouter)
 app.use('/auth', authRouter)
+app.use('/parcels', parcelsRouter)
 
 const server = app.listen(port, () => {
     console.log(`Server has been started at port: ${port}`)

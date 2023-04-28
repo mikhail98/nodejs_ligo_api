@@ -5,7 +5,7 @@ const auth = require('../middleware/auth')
 
 const router = express.Router()
 
-router.post('/parcel', auth, async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
         const {parcel} = req.body
 
@@ -22,3 +22,5 @@ router.post('/parcel', auth, async (req, res) => {
         res.status(400).send(error)
     }
 })
+
+module.exports = router
