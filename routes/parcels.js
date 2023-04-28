@@ -7,13 +7,13 @@ const router = express.Router()
 
 router.post('/', auth, async (req, res) => {
     try {
-        const {parcel} = req.body
+        const {user, startPoint, endPoint, size} = req.body
 
         const createdParcel = await Parcel.create({
-            user: parcel.user,
-            startPoint: parcel.startPoint,
-            endPoint: parcel.endPoint,
-            size: parcel.size,
+            user: user,
+            startPoint: startPoint,
+            endPoint: endPoint,
+            size: size,
             status: 'CREATED'
         })
 
