@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
         const oldUser = await User.findOne({email})
 
         if (oldUser) {
-            return res.status(404).send(Error.userExits)
+            return res.status(400).send(Error.userExits)
         }
 
         const encryptedPassword = await bcrypt.hash(password, 10)
@@ -68,7 +68,7 @@ router.get('/:id', auth, async (req, res) => {
     const user = await User.findOne({_id: req.params.id})
 
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
     user.password = null
     res.status(200).send(user)
@@ -81,7 +81,7 @@ router.patch('/:id/location', auth, async (req, res) => {
     const user = await User.findOneAndUpdate({_id}, {location: location})
 
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
     if (user.isDriver) {
         await Trip.findOneAndUpdate({driver: _id}, {driverLocation: location})
@@ -100,7 +100,7 @@ router.patch('/:id/status', auth, async (req, res) => {
     }
 
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
     res.status(201).send()
 })
@@ -111,7 +111,7 @@ router.patch('/:id/fcmToken', auth, async (req, res) => {
     const user = await User.findOneAndUpdate({_id}, {fcmToken: req.body["fcmToken"]})
 
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
     res.status(201).send()
 })
@@ -122,7 +122,7 @@ router.patch('/:id/passportPhoto', auth, async (req, res) => {
     const user = await User.findOneAndUpdate({_id}, {passportPhotoUrl: req.body["passportPhotoUrl"]})
 
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
     res.status(201).send()
 })
@@ -133,7 +133,7 @@ router.patch('/:id/avatar', auth, async (req, res) => {
     const user = await User.findOneAndUpdate({_id}, {avatarUrl: req.body["avatarUrl"]})
 
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
     res.status(201).send()
 })
@@ -144,12 +144,12 @@ router.patch('/:id/rating', auth, async (req, res) => {
     const userTo = await User.findOne({_id: req.params.id})
 
     if (!userTo) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
 
     const rating = req.body["rating"]
     if (rating.userFrom !== userFromEmail) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
 
     userTo.ratings.push(rating)
@@ -168,10 +168,10 @@ router.patch('/:id/validate', auth, async (req, res) => {
     const user = await User.findOne({_id: req.params.id})
 
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
     if (!user.isDriver) {
-        return res.status(404).send(Error.notADriver)
+        return res.status(400).send(Error.notADriver)
     }
 
     let isValidated = req.body["isValidated"]

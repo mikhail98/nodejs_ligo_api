@@ -54,8 +54,8 @@ function emitEvent(userId, eventName, data) {
 async function requestDriverForParcel(user, startPoint, endPoint, parcel) {
     const drivers = await User.find({isActive: true, isDriver: true})
     const driversAbleToStart = drivers
-        .filter(driver => !parcel.driversBlacklist.includes(driver._id))
-        .filter(driver => !parcel.notifiedDrivers.includes(driver._id))
+        .filter(driver => !parcel.driversBlacklist.includes(driver._id.toString()))
+        .filter(driver => !parcel.notifiedDrivers.includes(driver._id.toString()))
         .filter(driver => getDistanceBetween(startPoint, driver.location) < MAX_DISTANCE)
 
     const trips = await Trip.find()
@@ -64,7 +64,7 @@ async function requestDriverForParcel(user, startPoint, endPoint, parcel) {
         .map(trip => trip.driver)
 
     const driversAbleToFinish = driversAbleToStart
-        .filter(driver => driversWithSameEnd.includes(driver._id.toHexString()))
+        .filter(driver => driversWithSameEnd.includes(driver._id.toString()))
 
     driversAbleToFinish.forEach(driver => notifyDriver(driver, parcel))
 }

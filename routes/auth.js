@@ -12,7 +12,7 @@ router.post('/login', async (req, res) => {
     const user = await User.findOneAndUpdate({email}, {fcmToken})
 
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
 
     if (await bcrypt.compare(password, user.password)) {
@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
 router.post('/:id/logout', auth, async (req, res) => {
     const user = await User.findOneAndUpdate({_id: req.params.id}, {isActive: false, fcmToken: null,})
     if (!user) {
-        return res.status(404).send(Error.noSuchUser)
+        return res.status(400).send(Error.noSuchUser)
     }
     res.status(200).send()
 })
