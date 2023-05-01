@@ -23,7 +23,7 @@ router.post('/', auth, async (req, res) => {
             return res.status(400).send(Error.notADriver)
         }
 
-        const activeTrip = await Trip.findOne({driver})
+        const activeTrip = await Trip.findOne({driver, status: 'ACTIVE'})
         if (activeTrip !== null) {
             return res.status(400).send(Error.driverHasActiveTrip)
         }

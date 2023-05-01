@@ -188,4 +188,10 @@ router.patch('/:id/validate', auth, async (req, res) => {
     res.status(200).send(responseUser)
 })
 
+//get user by id
+router.get('/:id/trips', auth, async (req, res) => {
+    const trips = await Trip.find({driver: req.params.id})
+    res.status(200).send(trips)
+})
+
 module.exports = router
