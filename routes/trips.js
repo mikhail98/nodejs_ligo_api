@@ -48,7 +48,7 @@ router.post('/:id/complete', auth, async (req, res) => {
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)
     }
-    res.status(201).send()
+    res.status(200).send()
 })
 
 router.post('/:id/cancel', auth, async (req, res) => {
@@ -56,7 +56,7 @@ router.post('/:id/cancel', auth, async (req, res) => {
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)
     }
-    res.status(201).send()
+    res.status(200).send()
 })
 
 module.exports = router

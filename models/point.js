@@ -15,9 +15,12 @@ const pointSchema = new mongoose.Schema({
         type: String,
         unique: false,
         required: false,
+    },
+    address: {
+        type: String,
+        unique: false,
+        required: false,
     }
 })
-
-const Point = mongoose.model('Point', pointSchema)
 
 module.exports = pointSchema

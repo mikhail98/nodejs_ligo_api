@@ -86,7 +86,7 @@ router.patch('/:id/location', auth, async (req, res) => {
     if (user.isDriver) {
         await Trip.findOneAndUpdate({driver: _id}, {driverLocation: location})
     }
-    res.status(201).send()
+    res.status(200).send()
 })
 
 //update user status
@@ -102,7 +102,7 @@ router.patch('/:id/status', auth, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-    res.status(201).send()
+    res.status(200).send()
 })
 
 //update user fcm token
@@ -113,7 +113,7 @@ router.patch('/:id/fcmToken', auth, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-    res.status(201).send()
+    res.status(200).send()
 })
 
 //update user passportPhoto
@@ -124,7 +124,7 @@ router.patch('/:id/passportPhoto', auth, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-    res.status(201).send()
+    res.status(200).send()
 })
 
 //update user avatar
@@ -135,7 +135,7 @@ router.patch('/:id/avatar', auth, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-    res.status(201).send()
+    res.status(200).send()
 })
 
 //feedback user
@@ -154,7 +154,7 @@ router.patch('/:id/rating', auth, async (req, res) => {
 
     userTo.ratings.push(rating)
     await User.updateOne({_id: req.params.id}, userTo)
-    res.status(201).send()
+    res.status(200).send()
 })
 
 
@@ -188,7 +188,7 @@ router.patch('/:id/validate', auth, async (req, res) => {
     res.status(200).send(responseUser)
 })
 
-//get user by id
+//get user trips
 router.get('/:id/trips', auth, async (req, res) => {
     const trips = await Trip.find({driver: req.params.id})
     res.status(200).send(trips)
