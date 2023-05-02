@@ -52,10 +52,14 @@ function emitEvent(userId, eventName, data) {
 }
 
 async function requestDriverForParcel(user, startPoint, endPoint, parcel) {
+    const existedParcel = await Parcel.findOne({_id: parcel})
+    if (!existedParcel) {
+        return
+    }
     const drivers = await User.find({isActive: true, isDriver: true})
     const driversAbleToStart = drivers
-        .filter(driver => !parcel.driversBlacklist.includes(driver._id.toString()))
-        .filter(driver => !parcel.notifiedDrivers.includes(driver._id.toString()))
+        .filter(driver => !existedParcel.driversBlacklist.includes(driver._id.toString()))
+        .filter(driver => !existedParcel.notifiedDrivers.includes(driver._id.toString()))
         .filter(driver => getDistanceBetween(startPoint, driver.location) < MAX_DISTANCE)
 
     const trips = await Trip.find()
@@ -66,7 +70,7 @@ async function requestDriverForParcel(user, startPoint, endPoint, parcel) {
     const driversAbleToFinish = driversAbleToStart
         .filter(driver => driversWithSameEnd.includes(driver._id.toString()))
 
-    driversAbleToFinish.forEach(driver => notifyDriver(driver, parcel))
+    driversAbleToFinish.forEach(driver => notifyDriver(driver, existedParcel))
 }
 
 async function notifyDriver(driver, parcel) {
@@ -104,7 +108,7 @@ function deg2rad(deg) {
 }
 
 async function acceptParcel(driver, parcel) {
-    const existedParcel = await Parcel.findOne({_id: parcel._id})
+    const existedParcel = await Parcel.findOne({_id: parcel})
     if (!existedParcel) {
         return
     }
@@ -117,18 +121,18 @@ async function acceptParcel(driver, parcel) {
     trip.parcels.push(existedParcel)
 
     await Trip.updateOne({driver}, trip)
-    await Parcel.updateOne({_id: parcel._id}, existedParcel)
+    await Parcel.updateOne({_id: parcel}, existedParcel)
 
-    emitEvent(parcel.user.toString(), 'parcelAccepted', trip)
+    emitEvent(existedParcel.user.toString(), 'parcelAccepted', trip)
 }
 
 async function declineParcel(driver, parcel) {
-    const existedParcel = await Parcel.findOne({_id: parcel._id})
+    const existedParcel = await Parcel.findOne({_id: parcel})
     if (!existedParcel) {
         return
     }
     existedParcel.driversBlacklist.push(driver)
-    await Parcel.updateOne({_id: parcel._id}, existedParcel)
+    await Parcel.updateOne({_id: parcel}, existedParcel)
 }
 
 module.exports = {
