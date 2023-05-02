@@ -58,8 +58,8 @@ async function requestDriverForParcel(parcel) {
     }
     const drivers = await User.find({isActive: true, isDriver: true})
     const driversAbleToStart = drivers
-        .filter(driver => !existedParcel.driversBlacklist.includes(driver._id.toString()))
-        .filter(driver => !existedParcel.notifiedDrivers.includes(driver._id.toString()))
+        // .filter(driver => !existedParcel.driversBlacklist.includes(driver._id.toString()))
+        // .filter(driver => !existedParcel.notifiedDrivers.includes(driver._id.toString()))
         .filter(driver => getDistanceBetween(existedParcel.startPoint, driver.location) < MAX_DISTANCE)
     const trips = await Trip.find()
     const driversWithSameEnd = trips
