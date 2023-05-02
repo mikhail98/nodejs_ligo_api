@@ -14,7 +14,7 @@ router.post('/', auth, async (req, res) => {
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
         }
-        const user = await User.findOneAndUpdate({_id: driver}, {isActive: true})
+        const user = await User.findOne({_id: driver})
         if (!user) {
             return res.status(400).send(Error.noSuchUser)
         }
@@ -39,6 +39,7 @@ router.post('/', auth, async (req, res) => {
         res.status(200).send(trip)
 
     } catch (error) {
+        console.log(error)
         res.status(400).send(error)
     }
 })

@@ -1,7 +1,7 @@
 const io = require('socket.io')
 const Trip = require('../models/trip')
-const {Parcel} = require('../models/parcel')
 const User = require('../models/user')
+const {Parcel} = require('../models/parcel')
 const sendPushNotification = require("../firebase/push/fcm")
 
 const socketConnections = []
@@ -56,26 +56,25 @@ async function requestDriverForParcel(parcel) {
     if (!existedParcel) {
         return
     }
-    const drivers = await User.find({isActive: true, isDriver: true})
-    const driversAbleToStart = drivers
-        // .filter(driver => !existedParcel.driversBlacklist.includes(driver._id.toString()))
-        // .filter(driver => !existedParcel.notifiedDrivers.includes(driver._id.toString()))
-        .filter(driver => getDistanceBetween(existedParcel.startPoint, driver.location) < MAX_DISTANCE)
-    const trips = await Trip.find()
-    const driversWithSameEnd = trips
+    const trips = await Trip.find({status: 'ACTIVE'})
+    const suitableDriverIds = trips
+        .filter(trip => getDistanceBetween(existedParcel.startPoint, trip.driverLocation) < MAX_DISTANCE)
         .filter(trip => getDistanceBetween(existedParcel.endPoint, trip.endPoint) < MAX_DISTANCE)
+        .filter(trip => !existedParcel.driversBlacklist.includes(trip.driver))
+        .filter(trip => !existedParcel.notifiedDrivers.includes(trip.driver))
         .map(trip => trip.driver)
 
-    const driversAbleToFinish = driversAbleToStart
-        .filter(driver => driversWithSameEnd.includes(driver._id.toString()))
+    const suitableDrivers = await User.find({ '_id': { $in: suitableDriverIds } })
 
-    driversAbleToFinish.forEach(driver => notifyDriver(driver, existedParcel))
+    suitableDrivers.forEach(driver => notifyDriver(driver, existedParcel))
 }
 
 async function notifyDriver(driver, parcel) {
-    parcel.notifiedDrivers.push(driver._id)
+    if (!parcel.notifiedDrivers.includes(driver._id)) {
+        parcel.notifiedDrivers.push(driver._id)
+    }
     await Parcel.updateOne({_id: parcel._id}, parcel)
-    emitEvent(driver._id, "parcelAvailable", parcel)
+    emitEvent(driver._id.toString(), "parcelAvailable", parcel)
     if (driver.fcmToken) {
         sendPushNotification(driver.fcmToken, {
             key: "PARCEL_AVAILABLE",

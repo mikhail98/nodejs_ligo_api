@@ -28,11 +28,6 @@ const userSchema = new mongoose.Schema({
         unique: false,
         required: true,
     },
-    isActive: {
-        type: Boolean,
-        unique: false,
-        required: true,
-    },
     location: {
         type: pointSchema,
         unique: false,

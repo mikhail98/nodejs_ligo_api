@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/:id/logout', auth, async (req, res) => {
-    const user = await User.findOneAndUpdate({_id: req.params.id}, {isActive: false, fcmToken: null,})
+    const user = await User.findOneAndUpdate({_id: req.params.id}, {fcmToken: null})
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }

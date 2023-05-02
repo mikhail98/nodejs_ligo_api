@@ -13,7 +13,7 @@ const router = express.Router()
 //create user
 router.post('/', async (req, res) => {
     try {
-        const {name, email, password, phone, isDriver, isActive, fcmToken, passportPhotoUrl, avatarUrl} = req.body
+        const {name, email, password, phone, isDriver, fcmToken, passportPhotoUrl, avatarUrl} = req.body
 
         const oldUser = await User.findOne({email})
 
@@ -28,7 +28,6 @@ router.post('/', async (req, res) => {
             password: encryptedPassword,
             phone: phone,
             isDriver: isDriver,
-            isActive: isActive,
             isValidated: !isDriver,
             fcmToken: fcmToken,
             passportPhotoUrl: passportPhotoUrl,
@@ -85,22 +84,6 @@ router.patch('/:id/location', auth, async (req, res) => {
     }
     if (user.isDriver) {
         await Trip.findOneAndUpdate({driver: _id}, {driverLocation: location})
-    }
-    res.status(200).send()
-})
-
-//update user status
-router.patch('/:id/status', auth, async (req, res) => {
-    const isActive = req.body["isActive"]
-    const driver = req.params.id
-    const user = await User.findOneAndUpdate({_id: req.params.id}, {isActive})
-
-    if (!isActive) {
-        await Trip.findOneAndRemove({driver})
-    }
-
-    if (!user) {
-        return res.status(400).send(Error.noSuchUser)
     }
     res.status(200).send()
 })
