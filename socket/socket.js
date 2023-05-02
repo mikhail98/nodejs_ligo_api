@@ -28,7 +28,7 @@ function initSocket(server) {
             emitEvent(userId, "socketEntered", {isSuccess: true})
         })
         socket.on('requestDriverForParcel', (data) => {
-            requestDriverForParcel(data.user, data.startPoint, data.endPoint, data.parcel)
+            requestDriverForParcel(data.parcel)
         })
         socket.on('acceptParcel', (data) => {
             acceptParcel(data.driver, data.parcel)
@@ -51,7 +51,7 @@ function emitEvent(userId, eventName, data) {
     socketConnection.socket.emit(eventName, data)
 }
 
-async function requestDriverForParcel(user, startPoint, endPoint, parcel) {
+async function requestDriverForParcel(parcel) {
     const existedParcel = await Parcel.findOne({_id: parcel})
     if (!existedParcel) {
         return
@@ -60,11 +60,11 @@ async function requestDriverForParcel(user, startPoint, endPoint, parcel) {
     const driversAbleToStart = drivers
         .filter(driver => !existedParcel.driversBlacklist.includes(driver._id.toString()))
         .filter(driver => !existedParcel.notifiedDrivers.includes(driver._id.toString()))
-        .filter(driver => getDistanceBetween(startPoint, driver.location) < MAX_DISTANCE)
+        .filter(driver => getDistanceBetween(existedParcel.startPoint, driver.location) < MAX_DISTANCE)
 
     const trips = await Trip.find()
     const driversWithSameEnd = trips
-        .filter(trip => getDistanceBetween(endPoint, trip.endPoint) < MAX_DISTANCE)
+        .filter(trip => getDistanceBetween(existedParcel.endPoint, trip.endPoint) < MAX_DISTANCE)
         .map(trip => trip.driver)
 
     const driversAbleToFinish = driversAbleToStart
