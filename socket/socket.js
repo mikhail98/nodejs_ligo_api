@@ -4,28 +4,18 @@ const User = require('../models/user')
 const {Parcel} = require('../models/parcel')
 const sendPushNotification = require("../firebase/push/fcm")
 
-const socketConnections = []
-
 const MAX_DISTANCE = 15.0
 
+let socketServer
+
 function initSocket(server) {
-    const socketServer = new io.Server(server)
+    socketServer = new io.Server(server)
 
     socketServer.on('connection', socket => {
+
         socket.on('enterSocket', (data) => {
-
-            const userId = data.userId
-            const socketInstance = {socket: socket, _id: userId}
-
-            const connection = socketConnections.find(si => si._id === userId)
-
-            if (connection !== null) {
-                socketConnections.splice(socketConnections.indexOf(connection))
-            }
-
-            socketConnections.push(socketInstance)
-
-            emitEvent(userId, "socketEntered", {isSuccess: true})
+            socket.join(data.userId)
+            emitEvent(data.userId, "socketEntered", {isSuccess: true})
         })
         socket.on('requestDriverForParcel', (data) => {
             requestDriverForParcel(data.parcel)
@@ -40,15 +30,8 @@ function initSocket(server) {
 }
 
 function emitEvent(userId, eventName, data) {
-    const socketConnection = socketConnections.find(connection => connection._id === userId)
-
-    if (!socketConnection) {
-        return
-    }
-
+    socketServer.to(userId).emit(eventName, data)
     console.log("emmited " + eventName + " to " + userId)
-
-    socketConnection.socket.emit(eventName, data)
 }
 
 async function requestDriverForParcel(parcel) {
