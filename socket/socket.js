@@ -36,7 +36,6 @@ function emitEvent(userId, eventName, data) {
 
 async function requestDriverForParcel(parcel) {
     const existedParcel = await Parcel.findOne({_id: parcel})
-    console.log("requestDriverForParcel")
     if (!existedParcel) {
         return
     }
@@ -48,7 +47,7 @@ async function requestDriverForParcel(parcel) {
         .filter(trip => !existedParcel.notifiedDrivers.includes(trip.driver))
         .map(trip => trip.driver)
 
-    const suitableDrivers = await User.find({ '_id': { $in: suitableDriverIds } })
+    const suitableDrivers = await User.find({'_id': {$in: suitableDriverIds}})
     suitableDrivers.forEach(driver => notifyDriver(driver, existedParcel))
 }
 
@@ -100,10 +99,10 @@ async function acceptParcel(driver, parcel) {
     }
     trip.parcels.push(existedParcel)
 
-    await Trip.updateOne({driver: trip.driver}, trip)
+    await Trip.updateOne({_id: trip._id}, trip)
     await Parcel.updateOne({_id: parcel}, existedParcel)
 
-    emitEvent(existedParcel.user.toString(), 'parcelAccepted', trip)
+    emitEvent(existedParcel.user, 'parcelAccepted', trip)
 }
 
 async function declineParcel(driver, parcel) {
