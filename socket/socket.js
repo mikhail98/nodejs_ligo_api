@@ -53,6 +53,7 @@ function emitEvent(userId, eventName, data) {
 
 async function requestDriverForParcel(parcel) {
     const existedParcel = await Parcel.findOne({_id: parcel})
+    console.log("requestDriverForParcel")
     if (!existedParcel) {
         return
     }
@@ -65,7 +66,6 @@ async function requestDriverForParcel(parcel) {
         .map(trip => trip.driver)
 
     const suitableDrivers = await User.find({ '_id': { $in: suitableDriverIds } })
-
     suitableDrivers.forEach(driver => notifyDriver(driver, existedParcel))
 }
 
@@ -97,8 +97,7 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
         Math.sin(dLon / 2) * Math.sin(dLon / 2)
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    const d = R * c
-    return d
+    return R * c
 }
 
 function deg2rad(deg) {
@@ -112,13 +111,13 @@ async function acceptParcel(driver, parcel) {
     }
     existedParcel.status = 'ACCEPTED'
 
-    const trip = await Trip.findOne({driver})
+    const trip = await Trip.findOne({driver, status: 'ACTIVE'})
     if (!trip) {
         return
     }
     trip.parcels.push(existedParcel)
 
-    await Trip.updateOne({driver}, trip)
+    await Trip.updateOne({driver, status: 'ACTIVE'}, trip)
     await Parcel.updateOne({_id: parcel}, existedParcel)
 
     emitEvent(existedParcel.user.toString(), 'parcelAccepted', trip)
