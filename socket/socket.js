@@ -117,7 +117,7 @@ async function acceptParcel(driver, parcel) {
     }
     trip.parcels.push(existedParcel)
 
-    await Trip.updateOne({driver, status: 'ACTIVE'}, trip)
+    await Trip.updateOne({driver: trip.driver}, trip)
     await Parcel.updateOne({_id: parcel}, existedParcel)
 
     emitEvent(existedParcel.user.toString(), 'parcelAccepted', trip)
