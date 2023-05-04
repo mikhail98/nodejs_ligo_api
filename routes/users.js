@@ -7,6 +7,7 @@ const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const socket = require('../socket/socket')
 const sendPushNotification = require('../firebase/push/fcm')
+const {Parcel} = require("../models/parcel");
 
 const router = express.Router()
 
@@ -171,10 +172,15 @@ router.patch('/:id/validate', auth, async (req, res) => {
     res.status(200).send(responseUser)
 })
 
-//get user trips
-router.get('/:id/trips', auth, async (req, res) => {
+router.get('/:id/driverTrips', auth, async (req, res) => {
     const trips = await Trip.find({driver: req.params.id})
     res.status(200).send(trips)
+})
+
+router.get('/:id/senderTrips', auth, async (req, res) => {
+    const trips = await Trip.find()
+    const suitableTrips = trips.filter(trip=>trip.parcels.map(parcel=>parcel.user).includes(req.params.id))
+    res.status(200).send(suitableTrips)
 })
 
 module.exports = router
