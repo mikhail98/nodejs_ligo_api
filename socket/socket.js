@@ -60,7 +60,7 @@ async function notifyDriver(driver, parcel) {
     if (driver.fcmToken) {
         sendPushNotification(driver.fcmToken, {
             key: "PARCEL_AVAILABLE",
-            parcel: parcel.toString()
+            parcel: JSON.stringify(parcel)
         })
     }
 }
