@@ -189,9 +189,10 @@ router.get('/:id/senderParcels', auth, async (req, res) => {
     res.status(200).send(await getResponseTrips(responseParcels))
 })
 
-router.get('/:id/senderTrips', auth, async (req, res) => {
+router.get('/:id/senderTrips', async (req, res) => {
     const parcels = await Parcel.find({userId: req.params.id})
 
+    const trips = await Trip.find()
     const responseTrips = await Promise.all(
         parcels.map(async (parcel) => {
             if (parcel.status === "CREATED") {
@@ -200,9 +201,8 @@ router.get('/:id/senderTrips', auth, async (req, res) => {
                     createdAt: parcel.createdAt
                 }
             } else {
-                const trips = await Trip.find()
-                const trip = trips.find(trip => trip.parcels.map(parcel => parcel._id).includes(parcel._id))
-                const responseTrip = await getTripWithDriver(trip.toObject())
+                const trip = trips.find(trip => trip.parcels.map(parcel => parcel._id.toString()).includes(parcel._id.toString()))
+                const responseTrip = await getTripWithDriver(trip)
                 responseTrip.parcels = await Promise.all(
                     responseTrip.parcels.map(async (parcel) => {
                         return await getParcelWithUser(parcel)
@@ -231,14 +231,14 @@ async function getResponseTrips(trips) {
 
 async function getTripWithDriver(trip) {
     const user = await User.findOne({_id: trip.driverId})
-    user.passeord = null
+    user.password = null
     trip.driver = user
     return trip
 }
 
 async function getParcelWithUser(parcel) {
     const user = await User.findOne({_id: parcel.userId})
-    user.passewrd = null
+    user.password = null
     parcel.user = user
     return parcel
 }
