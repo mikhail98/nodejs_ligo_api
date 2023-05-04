@@ -56,11 +56,17 @@ async function notifyDriver(driver, parcel) {
         parcel.notifiedDrivers.push(driver._id)
     }
     await Parcel.updateOne({_id: parcel._id}, parcel)
-    emitEvent(driver._id.toString(), "parcelAvailable", parcel)
+
+    const responseParcel = parcel.toObject()
+    const user = await User.findOne({_id: parcel.userId})
+    user.password = null
+    responseParcel.user = user
+
+    emitEvent(driver._id.toString(), "parcelAvailable", responseParcel)
     if (driver.fcmToken) {
         sendPushNotification(driver.fcmToken, {
             key: "PARCEL_AVAILABLE",
-            parcel: JSON.stringify(parcel)
+            parcel: JSON.stringify(responseParcel)
         })
     }
 }
@@ -102,7 +108,12 @@ async function acceptParcel(driverId, parcel) {
     await Trip.updateOne({_id: trip._id}, trip)
     await Parcel.updateOne({_id: parcel}, existedParcel)
 
-    emitEvent(existedParcel.user, 'parcelAccepted', trip)
+    const responseTrip = trip.toObject()
+    const user = await User.findOne({_id: driverId})
+    user.password = null
+    responseTrip.user = user
+
+    emitEvent(existedParcel.user, 'parcelAccepted', responseTrip)
 }
 
 async function declineParcel(driver, parcel) {
