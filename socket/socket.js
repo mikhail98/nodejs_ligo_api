@@ -17,6 +17,9 @@ function initSocket(server) {
             socket.join(data.userId)
             emitEvent(data.userId, "socketEntered", {isSuccess: true})
         })
+        socket.on('leaveSocket', (data) => {
+            socket.leave(data.userId)
+        })
         socket.on('requestDriverForParcel', (data) => {
             requestDriverForParcel(data.parcelId)
         })
