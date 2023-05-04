@@ -64,12 +64,12 @@ async function notifyDriver(driver, parcel) {
     responseParcel.user = user
 
     emitEvent(driver._id.toString(), "parcelAvailable", responseParcel)
-    if (driver.fcmToken) {
-        sendPushNotification(driver.fcmToken, {
+    driver.fcmTokens.forEach(token => {
+        sendPushNotification(token, {
             key: "PARCEL_AVAILABLE",
             parcel: JSON.stringify(responseParcel)
         })
-    }
+    })
 }
 
 function getDistanceBetween(point1, point2) {

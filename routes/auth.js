@@ -8,8 +8,8 @@ const auth = require("../middleware/auth")
 const router = express.Router()
 
 router.post('/login', async (req, res) => {
-    const {email, password, fcmToken} = req.body
-    const user = await User.findOneAndUpdate({email}, {fcmToken})
+    const {email, password} = req.body
+    const user = await User.findOne({email})
 
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
@@ -31,6 +31,9 @@ router.post('/:id/logout', auth, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
+    const {fcmToken} = req.body
+    user.fcmTokens = user.fcmTokens.filter(token => token !== fcmToken)
+    await User.updateOne({_id: req.params.id}, user)
     res.status(200).send()
 })
 

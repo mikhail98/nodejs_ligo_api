@@ -33,11 +33,11 @@ const userSchema = new mongoose.Schema({
         unique: false,
         required: false,
     },
-    fcmToken: {
+    fcmTokens: [{
         type: String,
         unique: false,
         required: false,
-    },
+    }],
     isValidated: {
         type: Boolean,
         unique: false,

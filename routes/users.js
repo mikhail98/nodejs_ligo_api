@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
             phone: phone,
             isDriver: isDriver,
             isValidated: !isDriver,
-            fcmToken: fcmToken,
+            fcmTokens: [fcmToken],
             passportPhotoUrl: passportPhotoUrl,
             avatarUrl: avatarUrl,
             isAdmin: false
@@ -91,7 +91,9 @@ router.patch('/:id/location', auth, async (req, res) => {
 //update user fcm token
 router.patch('/:id/fcmToken', auth, async (req, res) => {
     const _id = req.params.id
-    const user = await User.findOneAndUpdate({_id}, {fcmToken: req.body["fcmToken"]})
+    const user = await User.findOne({_id})
+    user.fcmTokens.push(req.body["fcmToken"])
+    await User.updateOne({_id}, user)
 
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
@@ -161,12 +163,12 @@ router.patch('/:id/validate', auth, async (req, res) => {
     await User.findOneAndUpdate({_id: req.params.id}, {isValidated})
     const responseUser = await User.findOne({_id: req.params.id})
     socket.emitEvent(responseUser._id.toString(), "userValidated", {isValidated})
-    if (responseUser.fcmToken) {
-        sendPushNotification(responseUser.fcmToken, {
+    responseUser.fcmTokens.forEach(token => {
+        sendPushNotification(token, {
             key: "USER_VALIDATED",
             isValidated: isValidated.toString()
         })
-    }
+    })
     responseUser.password = null
     res.status(200).send(responseUser)
 })
