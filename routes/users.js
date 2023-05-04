@@ -173,30 +173,41 @@ router.patch('/:id/validate', auth, async (req, res) => {
 
 router.get('/:id/driverTrips', auth, async (req, res) => {
     const trips = await Trip.find({driverId: req.params.id})
-    const response = await Promise.all(
-        trips.map(async (trip) => {
-            return await getTripWithDriver(trip.toObject())
-        })
-    )
-    res.status(200).send(response)
+    res.status(200).send(await getResponseTrips(trips))
 })
 
 router.get('/:id/senderTrips', auth, async (req, res) => {
     const trips = await Trip.find()
     const suitableTrips = trips.filter(trip => trip.parcels.map(parcel => parcel.userId).includes(req.params.id))
-    const response = await Promise.all(
-        suitableTrips.map(async (trip) => {
-            return await getTripWithDriver(trip.toObject())
+    res.status(200).send(await getResponseTrips(suitableTrips))
+})
+
+async function getResponseTrips(trips) {
+    return await Promise.all(
+        trips.map(async (trip) => {
+            const responseTrip = await getTripWithDriver(trip.toObject())
+            responseTrip.parcels = await Promise.all(
+                responseTrip.parcels.map(async (parcel) => {
+                    return await getParcelWithUser(parcel)
+                })
+            )
+            return responseTrip
         })
     )
-    res.status(200).send(response)
-})
+}
 
 async function getTripWithDriver(trip) {
     const user = await User.findOne({_id: trip.driverId})
     user.passeord = null
     trip.driver = user
     return trip
+}
+
+async function getParcelWithUser(parcel) {
+    const user = await User.findOne({_id: parcel.userId})
+    user.passewrd = null
+    parcel.user = user
+    return parcel
 }
 
 module.exports = router
