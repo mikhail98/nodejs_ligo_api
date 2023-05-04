@@ -9,12 +9,12 @@ const router = express.Router()
 //create trip
 router.post('/', auth, async (req, res) => {
     try {
-        const {driver, startPoint, endPoint, driverLocation} = req.body
+        const {driverId, startPoint, endPoint, driverLocation} = req.body
 
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
         }
-        const user = await User.findOne({_id: driver})
+        const user = await User.findOne({_id: driverId})
         if (!user) {
             return res.status(400).send(Error.noSuchUser)
         }
@@ -23,21 +23,25 @@ router.post('/', auth, async (req, res) => {
             return res.status(400).send(Error.notADriver)
         }
 
-        const activeTrip = await Trip.findOne({driver, status: 'ACTIVE'})
+        const activeTrip = await Trip.findOne({driverId: driverId, status: 'ACTIVE'})
         if (activeTrip !== null) {
             return res.status(400).send(Error.driverHasActiveTrip)
         }
 
         const trip = await Trip.create({
-            driver: driver,
+            driverId: driverId,
             startPoint: startPoint,
             endPoint: endPoint,
             driverLocation: driverLocation,
             status: 'ACTIVE',
             parcels: []
         })
-        res.status(200).send(trip)
 
+        const tripResponse = trip.toObject()
+        user.password = null
+        tripResponse.driver = user
+
+        res.status(200).send(tripResponse)
     } catch (error) {
         console.log(error)
         res.status(400).send(error)

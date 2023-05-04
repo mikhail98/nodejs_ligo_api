@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const pointSchema = require("../models/point")
 
 const parcelSchema = new mongoose.Schema({
-    user: {
+    userId: {
         type: String,
         unique: false,
         required: true,

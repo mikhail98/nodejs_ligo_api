@@ -18,13 +18,13 @@ function initSocket(server) {
             emitEvent(data.userId, "socketEntered", {isSuccess: true})
         })
         socket.on('requestDriverForParcel', (data) => {
-            requestDriverForParcel(data.parcel)
+            requestDriverForParcel(data.driverId)
         })
         socket.on('acceptParcel', (data) => {
-            acceptParcel(data.driver, data.parcel)
+            acceptParcel(data.driverId, data.driverId)
         })
         socket.on('declineParcel', (data) => {
-            declineParcel(data.driver, data.parcel)
+            declineParcel(data.driverId, data.driverId)
         })
     })
 }
@@ -43,9 +43,9 @@ async function requestDriverForParcel(parcel) {
     const suitableDriverIds = trips
         .filter(trip => getDistanceBetween(existedParcel.startPoint, trip.driverLocation) < MAX_DISTANCE)
         .filter(trip => getDistanceBetween(existedParcel.endPoint, trip.endPoint) < MAX_DISTANCE)
-        .filter(trip => !existedParcel.driversBlacklist.includes(trip.driver))
-        .filter(trip => !existedParcel.notifiedDrivers.includes(trip.driver))
-        .map(trip => trip.driver)
+        .filter(trip => !existedParcel.driversBlacklist.includes(trip.driverId))
+        .filter(trip => !existedParcel.notifiedDrivers.includes(trip.driverId))
+        .map(trip => trip.driverId)
 
     const suitableDrivers = await User.find({_id: {$in: suitableDriverIds}})
     suitableDrivers.forEach(driver => notifyDriver(driver, existedParcel))
@@ -86,14 +86,14 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
 
-async function acceptParcel(driver, parcel) {
+async function acceptParcel(driverId, parcel) {
     const existedParcel = await Parcel.findOne({_id: parcel})
     if (!existedParcel) {
         return
     }
     existedParcel.status = 'ACCEPTED'
 
-    const trip = await Trip.findOne({driver, status: 'ACTIVE'})
+    const trip = await Trip.findOne({driverId, status: 'ACTIVE'})
     if (!trip) {
         return
     }

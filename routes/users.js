@@ -7,7 +7,6 @@ const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const socket = require('../socket/socket')
 const sendPushNotification = require('../firebase/push/fcm')
-const {Parcel} = require("../models/parcel");
 
 const router = express.Router()
 
@@ -173,14 +172,31 @@ router.patch('/:id/validate', auth, async (req, res) => {
 })
 
 router.get('/:id/driverTrips', auth, async (req, res) => {
-    const trips = await Trip.find({driver: req.params.id})
-    res.status(200).send(trips)
+    const trips = await Trip.find({driverId: req.params.id})
+    const response = await Promise.all(
+        trips.map(async (trip) => {
+            return await getTripWithDriver(trip.toObject())
+        })
+    )
+    res.status(200).send(response)
 })
 
 router.get('/:id/senderTrips', auth, async (req, res) => {
     const trips = await Trip.find()
-    const suitableTrips = trips.filter(trip=>trip.parcels.map(parcel=>parcel.user).includes(req.params.id))
-    res.status(200).send(suitableTrips)
+    const suitableTrips = trips.filter(trip => trip.parcels.map(parcel => parcel.userId).includes(req.params.id))
+    const response = await Promise.all(
+        suitableTrips.map(async (trip) => {
+            return await getTripWithDriver(trip.toObject())
+        })
+    )
+    res.status(200).send(response)
 })
+
+async function getTripWithDriver(trip) {
+    const user = await User.findOne({_id: trip.driverId})
+    user.passeord = null
+    trip.driver = user
+    return trip
+}
 
 module.exports = router

@@ -3,7 +3,7 @@ const pointSchema = require('../models/point')
 const parcelSchema = require('../models/parcel').parcelSchema
 
 const tripSchema = new mongoose.Schema({
-    driver: {
+    driverId: {
         type: String,
         required: true,
     },
