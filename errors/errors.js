@@ -1,6 +1,7 @@
 const wrongPassword = createError("Wrong password")
 const noSuchUser = createError("No such user")
 const noSuchTrip = createError("No such trip")
+const noSuchParcel = createError("No such parcel")
 const userExits = createError("This user also exists")
 const notADriver = createError("Not a driver")
 const requiredToken = createError("Token is required")
@@ -21,6 +22,7 @@ module.exports = {
     pointsAreTheSame,
     notADriver,
     userExits,
+    noSuchParcel,
     requiredToken,
     invalidToken,
     youNeedAdminRights,
