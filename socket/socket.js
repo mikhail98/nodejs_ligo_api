@@ -112,7 +112,7 @@ async function acceptParcel(driverId, parcelId) {
     const responseTrip = trip.toObject()
     const user = await User.findOne({_id: driverId})
     user.password = null
-    responseTrip.user = user
+    responseTrip.driver = user
 
     emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
 }
