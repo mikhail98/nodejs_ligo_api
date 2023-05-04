@@ -18,7 +18,7 @@ function initSocket(server) {
             emitEvent(data.userId, "socketEntered", {isSuccess: true})
         })
         socket.on('requestDriverForParcel', (data) => {
-            requestDriverForParcel(data.driverId)
+            requestDriverForParcel(data.parcelId)
         })
         socket.on('acceptParcel', (data) => {
             acceptParcel(data.driverId, data.parcelId)
@@ -34,8 +34,8 @@ function emitEvent(userId, eventName, data) {
     console.log("emmited " + eventName + " to " + userId)
 }
 
-async function requestDriverForParcel(parcel) {
-    const existedParcel = await Parcel.findOne({_id: parcel})
+async function requestDriverForParcel(parcelId) {
+    const existedParcel = await Parcel.findOne({_id: parcelId})
     if (!existedParcel) {
         return
     }
@@ -47,6 +47,7 @@ async function requestDriverForParcel(parcel) {
         .filter(trip => !existedParcel.notifiedDrivers.includes(trip.driverId))
         .map(trip => trip.driverId)
 
+    console.log(suitableDriverIds)
     const suitableDrivers = await User.find({_id: {$in: suitableDriverIds}})
     suitableDrivers.forEach(driver => notifyDriver(driver, existedParcel))
 }
