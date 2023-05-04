@@ -41,12 +41,26 @@ router.post('/', auth, async (req, res) => {
         user.password = null
         tripResponse.driver = user
 
+        const parcels = await Promise.all(
+            tripResponse.parcels.map(async (parcel) => {
+                return await getParcelWithUser(parcel.toObject())
+            })
+        )
+        tripResponse.parcels = parcels
+
         res.status(200).send(tripResponse)
     } catch (error) {
         console.log(error)
         res.status(400).send(error)
     }
 })
+
+async function getParcelWithUser(parcel) {
+    const user = await User.findOne({_id: parcel.userId})
+    user.passeord = null
+    parcel.user = user
+    return parcel
+}
 
 router.post('/:id/complete', auth, async (req, res) => {
     const trip = await Trip.findOneAndUpdate({_id: req.params.id}, {status: 'COMPLETED'})
