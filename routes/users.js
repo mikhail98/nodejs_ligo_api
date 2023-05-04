@@ -183,10 +183,36 @@ router.get('/:id/senderParcels', auth, async (req, res) => {
     const parcels = await Parcel.find({userId: req.params.id})
     const responseParcels = await Promise.all(
         parcels.map(async (parcel) => {
-            return await getParcelWithUser(parcel.toObject())
+            return await getParcelWithUser(parcel)
         })
     )
-    res.status(200).send(responseParcels)
+    res.status(200).send(await getResponseTrips(responseParcels))
+})
+
+router.get('/:id/senderTrips', auth, async (req, res) => {
+    const parcels = await Parcel.find({userId: req.params.id})
+
+    const responseTrips = await Promise.all(
+        parcels.map(async (parcel) => {
+            if (parcel.status === "CREATED") {
+                return {
+                    parcels: [parcel],
+                    createdAt: parcel.createdAt
+                }
+            } else {
+                const trips = await Trip.find()
+                const trip = trips.find(trip => trip.parcels.map(parcel => parcel._id).includes(parcel._id))
+                const responseTrip = await getTripWithDriver(trip.toObject())
+                responseTrip.parcels = await Promise.all(
+                    responseTrip.parcels.map(async (parcel) => {
+                        return await getParcelWithUser(parcel)
+                    })
+                )
+                return responseTrip
+            }
+        })
+    )
+    res.status(200).send(responseTrips)
 })
 
 async function getResponseTrips(trips) {
