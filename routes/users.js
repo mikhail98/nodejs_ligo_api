@@ -189,7 +189,7 @@ router.get('/:id/senderParcels', auth, async (req, res) => {
     res.status(200).send(await getResponseTrips(responseParcels))
 })
 
-router.get('/:id/senderTrips', async (req, res) => {
+router.get('/:id/senderTrips', auth, async (req, res) => {
     const parcels = await Parcel.find({userId: req.params.id})
 
     const trips = await Trip.find()
