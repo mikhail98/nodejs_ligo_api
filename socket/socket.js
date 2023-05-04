@@ -21,10 +21,10 @@ function initSocket(server) {
             requestDriverForParcel(data.driverId)
         })
         socket.on('acceptParcel', (data) => {
-            acceptParcel(data.driverId, data.driverId)
+            acceptParcel(data.driverId, data.parcelId)
         })
         socket.on('declineParcel', (data) => {
-            declineParcel(data.driverId, data.driverId)
+            declineParcel(data.driverId, data.parcelId)
         })
     })
 }
@@ -92,8 +92,8 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
 
-async function acceptParcel(driverId, parcel) {
-    const existedParcel = await Parcel.findOne({_id: parcel})
+async function acceptParcel(driverId, parcelId) {
+    const existedParcel = await Parcel.findOne({_id: parcelId})
     if (!existedParcel) {
         return
     }
@@ -106,7 +106,7 @@ async function acceptParcel(driverId, parcel) {
     trip.parcels.push(existedParcel)
 
     await Trip.updateOne({_id: trip._id}, trip)
-    await Parcel.updateOne({_id: parcel}, existedParcel)
+    await Parcel.updateOne({_id: parcelId}, existedParcel)
 
     const responseTrip = trip.toObject()
     const user = await User.findOne({_id: driverId})
@@ -116,13 +116,13 @@ async function acceptParcel(driverId, parcel) {
     emitEvent(existedParcel.user, 'parcelAccepted', responseTrip)
 }
 
-async function declineParcel(driver, parcel) {
-    const existedParcel = await Parcel.findOne({_id: parcel})
+async function declineParcel(driverId, parcelId) {
+    const existedParcel = await Parcel.findOne({_id: parcelId})
     if (!existedParcel) {
         return
     }
-    existedParcel.driversBlacklist.push(driver)
-    await Parcel.updateOne({_id: parcel}, existedParcel)
+    existedParcel.driversBlacklist.push(driverId)
+    await Parcel.updateOne({_id: parcelId}, existedParcel)
 }
 
 module.exports = {
