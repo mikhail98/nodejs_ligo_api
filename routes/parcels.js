@@ -1,6 +1,7 @@
 const express = require('express')
 
 const {Parcel} = require('../models/parcel')
+const User = require('../models/user')
 const auth = require('../middleware/auth')
 const Errors = require("../errors/errors");
 
@@ -8,15 +9,23 @@ const router = express.Router()
 
 router.post('/', auth, async (req, res) => {
     try {
-        const {user, startPoint, endPoint, size} = req.body
+        const {userId, startPoint, endPoint, size} = req.body
+
+        const user = await User.findOne({_id, userId})
+
+        if (user === null) {
+            return res.status(400).send(Errors.noSuchUser)
+        }
 
         const createdParcel = await Parcel.create({
-            user: user,
+            user: userId,
             startPoint: startPoint,
             endPoint: endPoint,
             size: size,
             status: 'CREATED'
         })
+
+        createdParcel.user = user
 
         res.status(200).send(createdParcel)
     } catch (error) {
