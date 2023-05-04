@@ -39,7 +39,7 @@ const parcelSchema = new mongoose.Schema({
         unique: false,
         required: true
     }
-})
+}, {timestamps: true})
 
 const Parcel = mongoose.model('Parcel', parcelSchema)
 
