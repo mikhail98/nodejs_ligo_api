@@ -114,7 +114,7 @@ async function acceptParcel(driverId, parcelId) {
     user.password = null
     responseTrip.user = user
 
-    emitEvent(existedParcel.user, 'parcelAccepted', responseTrip)
+    emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
 }
 
 async function declineParcel(driverId, parcelId) {
