@@ -92,7 +92,7 @@ router.patch('/:id/location', auth, async (req, res) => {
         return res.status(400).send(Error.noSuchUser)
     }
     if (user.isDriver) {
-        await Trip.findOneAndUpdate({driver: _id}, {driverLocation: location})
+        await Trip.findOneAndUpdate({driver: _id, status: 'ACTIVE'}, {driverLocation: location})
     }
     res.status(200).send()
 })
@@ -216,10 +216,11 @@ router.get('/:id/senderTrips', auth, async (req, res) => {
                 const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcel._id.toString()))
                 const responseTrip = await getTripWithDriver(trip.toObject())
                 responseTrip.parcels = await Promise.all(
-                    responseTrip.parcels.map(async (parcelId) => {
+                    responseTrip.parcels.filter(parcelId => parcelId !== parcel._id).map(async (parcelId) => {
                         return await getParcelWithUserById(parcelId)
                     })
                 )
+
                 return responseTrip
             }
         })
