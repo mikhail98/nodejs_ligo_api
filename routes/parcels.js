@@ -133,7 +133,7 @@ router.get('/:id/secret', auth, async (req, res) => {
     }
 
     const user = await User.findOne({email: req.user.email_id})
-    if (secret.userId !== user._id) {
+    if (secret.userId !== user._id.toString()) {
         return res.status(400).send(Errors.accessDenied)
     }
 
