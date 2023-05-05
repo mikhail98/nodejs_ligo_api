@@ -216,7 +216,7 @@ router.get('/:id/senderTrips', auth, async (req, res) => {
                 const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcel._id.toString()))
                 const responseTrip = await getTripWithDriver(trip.toObject())
                 responseTrip.parcels = await Promise.all(
-                    responseTrip.parcels.filter(parcelId => parcelId !== parcel._id).map(async (parcelId) => {
+                    responseTrip.parcels.filter(parcelId => parcelId !== parcel._id.toString()).map(async (parcelId) => {
                         return await getParcelWithUserById(parcelId)
                     })
                 )
