@@ -114,6 +114,12 @@ async function acceptParcel(driverId, parcelId) {
     await Parcel.updateOne({_id: parcelId}, existedParcel)
 
     const responseTrip = trip.toObject()
+    responseTrip.parcels = await Promise.all(
+        trip.parcels.map(async (parcelId) => {
+                return getParcelWithUserById(parcelId)
+            }
+        )
+    )
     const user = await User.findOne({_id: driverId})
     user.password = null
     user.fcmTokens = []
@@ -129,6 +135,16 @@ async function declineParcel(driverId, parcelId) {
     }
     existedParcel.driversBlacklist.push(driverId)
     await Parcel.updateOne({_id: parcelId}, existedParcel)
+}
+
+async function getParcelWithUserById(parcelId) {
+    const parcel = await Parcel.findOne({_id: parcelId})
+    const user = await User.findOne({_id: parcel.userId})
+    const responseParcel = parcel.toObject()
+    user.password = null
+    user.fcmTokens = []
+    responseParcel.user = user
+    return responseParcel
 }
 
 module.exports = {
