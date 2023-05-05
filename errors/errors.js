@@ -9,6 +9,8 @@ const invalidToken = createError("Invalid token")
 const driverHasActiveTrip = createError("Driver has active an trip")
 const pointsAreTheSame = createError("startPoint can't be equal to endPoint")
 const youNeedAdminRights = createError("You need to be an admin to do that")
+const noSecretForThisParcel = createError("No secret for this parcel")
+const accessDenied = createError("Access denied")
 
 function createError(msg) {
     return {
@@ -27,5 +29,7 @@ module.exports = {
     invalidToken,
     youNeedAdminRights,
     noSuchTrip,
-    driverHasActiveTrip
+    driverHasActiveTrip,
+    noSecretForThisParcel,
+    accessDenied
 }

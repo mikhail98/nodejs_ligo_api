@@ -77,7 +77,7 @@ router.get('/:id', auth, async (req, res) => {
 //update user location
 router.patch('/:id/location', auth, async (req, res) => {
     const _id = req.params.id
-    const location = req.body["location"]
+    const {location} = req.body
     const user = await User.findOneAndUpdate({_id}, {location: location})
 
     if (!user) {
@@ -93,7 +93,8 @@ router.patch('/:id/location', auth, async (req, res) => {
 router.patch('/:id/fcmToken', auth, async (req, res) => {
     const _id = req.params.id
     const user = await User.findOne({_id})
-    user.fcmTokens.push(req.body["fcmToken"])
+    const {fcmToken} = req.body
+    user.fcmTokens.push(fcmToken)
     await User.updateOne({_id}, user)
 
     if (!user) {
@@ -105,7 +106,8 @@ router.patch('/:id/fcmToken', auth, async (req, res) => {
 //update user passportPhoto
 router.patch('/:id/passportPhoto', auth, async (req, res) => {
     const _id = req.params.id
-    const user = await User.findOneAndUpdate({_id}, {passportPhotoUrl: req.body["passportPhotoUrl"]})
+    const {passportPhotoUrl} = req.body
+    const user = await User.findOneAndUpdate({_id}, {passportPhotoUrl})
 
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
@@ -116,7 +118,8 @@ router.patch('/:id/passportPhoto', auth, async (req, res) => {
 //update user avatar
 router.patch('/:id/avatar', auth, async (req, res) => {
     const _id = req.params.id
-    const user = await User.findOneAndUpdate({_id}, {avatarUrl: req.body["avatarUrl"]})
+    const {avatarUrl} = req.body
+    const user = await User.findOneAndUpdate({_id}, {avatarUrl})
 
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
@@ -133,7 +136,7 @@ router.patch('/:id/rating', auth, async (req, res) => {
         return res.status(400).send(Error.noSuchUser)
     }
 
-    const rating = req.body["rating"]
+    const {rating} = req.body
     if (rating.userFrom !== userFromEmail) {
         return res.status(400).send(Error.noSuchUser)
     }
@@ -160,7 +163,7 @@ router.patch('/:id/validate', auth, async (req, res) => {
         return res.status(400).send(Error.notADriver)
     }
 
-    let isValidated = req.body["isValidated"]
+    let {isValidated} = req.body
     await User.findOneAndUpdate({_id: req.params.id}, {isValidated})
     const responseUser = await User.findOne({_id: req.params.id})
     socket.emitEvent(responseUser._id.toString(), "userValidated", {isValidated})
