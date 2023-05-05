@@ -76,6 +76,7 @@ router.post('/:id/pickup', auth, async (req, res) => {
     parcel.status = 'PICKED'
     Socket.emitEvent(parcel.userId, "parcelPicked", parcel)
     await Parcel.updateOne({_id: parcelId}, parcel)
+    res.status(200).send(parcel)
 })
 
 router.post('/:id/deliver', auth, async (req, res) => {
@@ -101,6 +102,7 @@ router.post('/:id/deliver', auth, async (req, res) => {
     parcel.status = 'DELIVERED'
     Socket.emitEvent(parcel.userId, "parcelDelivered", parcel)
     await Parcel.updateOne({_id: parcelId}, parcel)
+    res.status(200).send(parcel)
 })
 
 router.post('/:id/secret', auth, async (req, res) => {
