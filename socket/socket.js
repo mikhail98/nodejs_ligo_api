@@ -64,6 +64,7 @@ async function notifyDriver(driver, parcel) {
     const responseParcel = parcel.toObject()
     const user = await User.findOne({_id: parcel.userId})
     user.password = null
+    user.fcmTokens = []
     responseParcel.user = user
 
     emitEvent(driver._id.toString(), "parcelAvailable", responseParcel)
@@ -107,7 +108,7 @@ async function acceptParcel(driverId, parcelId) {
     if (!trip) {
         return
     }
-    trip.parcels.push(existedParcel)
+    trip.parcels.push(parcelId)
 
     await Trip.updateOne({_id: trip._id}, trip)
     await Parcel.updateOne({_id: parcelId}, existedParcel)
@@ -115,6 +116,7 @@ async function acceptParcel(driverId, parcelId) {
     const responseTrip = trip.toObject()
     const user = await User.findOne({_id: driverId})
     user.password = null
+    user.fcmTokens = []
     responseTrip.driver = user
 
     emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)

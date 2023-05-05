@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const pointSchema = require('../models/point')
-const parcelSchema = require('../models/parcel').parcelSchema
 
 const tripSchema = new mongoose.Schema({
     driverId: {
@@ -25,7 +24,7 @@ const tripSchema = new mongoose.Schema({
         required: true
     },
     parcels: [{
-        type: parcelSchema,
+        type: String,
         required: false,
     }]
 }, {timestamps: true})

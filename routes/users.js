@@ -39,6 +39,7 @@ router.post('/', async (req, res) => {
             {email_id: email.toLowerCase()}, "LigoTokenKey", {}
         )
         user.password = null
+        user.fcmTokens = []
         res.status(200).send(user)
     } catch (error) {
         res.status(400).send(error)
@@ -48,7 +49,10 @@ router.post('/', async (req, res) => {
 //get all users
 router.get('/', auth, async (req, res) => {
     const users = await User.find()
-    users.forEach(user => user.password = null)
+    users.forEach(user => {
+        user.password = null
+        user.fcmTokens = []
+    })
     res.status(200).send(users)
 })
 
@@ -56,7 +60,10 @@ router.get('/', auth, async (req, res) => {
 router.get('/drivers', async (req, res) => {
     try {
         const drivers = await User.find({isDriver: true})
-        drivers.forEach(driver => driver.password = null)
+        drivers.forEach(driver => {
+            driver.password = null
+            driver.fcmTokens = []
+        })
         res.status(200).send(drivers)
     } catch (error) {
         res.status(500).send(error)
@@ -71,6 +78,7 @@ router.get('/:id', auth, async (req, res) => {
         return res.status(400).send(Error.noSuchUser)
     }
     user.password = null
+    user.fcmTokens = []
     res.status(200).send(user)
 })
 
@@ -174,22 +182,23 @@ router.patch('/:id/validate', auth, async (req, res) => {
         })
     })
     responseUser.password = null
+    responseUser.fcmTokens = []
     res.status(200).send(responseUser)
-})
-
-router.get('/:id/driverTrips', auth, async (req, res) => {
-    const trips = await Trip.find({driverId: req.params.id})
-    res.status(200).send(await getResponseTrips(trips))
 })
 
 router.get('/:id/senderParcels', auth, async (req, res) => {
     const parcels = await Parcel.find({userId: req.params.id})
     const responseParcels = await Promise.all(
-        parcels.map(async (parcel) => {
-            return await getParcelWithUser(parcel)
+        parcels.map(async (parcelId) => {
+            return await getParcelWithUserById(parcelId)
         })
     )
     res.status(200).send(await getResponseTrips(responseParcels))
+})
+
+router.get('/:id/driverTrips', auth, async (req, res) => {
+    const trips = await Trip.find({driverId: req.params.id})
+    res.status(200).send(await getResponseTrips(trips))
 })
 
 router.get('/:id/senderTrips', auth, async (req, res) => {
@@ -204,11 +213,11 @@ router.get('/:id/senderTrips', auth, async (req, res) => {
                     createdAt: parcel.createdAt
                 }
             } else {
-                const trip = trips.find(trip => trip.parcels.map(parcel => parcel._id.toString()).includes(parcel._id.toString()))
+                const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcel._id.toString()))
                 const responseTrip = await getTripWithDriver(trip.toObject())
                 responseTrip.parcels = await Promise.all(
-                    responseTrip.parcels.map(async (parcel) => {
-                        return await getParcelWithUser(parcel)
+                    responseTrip.parcels.map(async (parcelId) => {
+                        return await getParcelWithUserById(parcelId)
                     })
                 )
                 return responseTrip
@@ -223,8 +232,8 @@ async function getResponseTrips(trips) {
         trips.map(async (trip) => {
             const responseTrip = await getTripWithDriver(trip.toObject())
             responseTrip.parcels = await Promise.all(
-                responseTrip.parcels.map(async (parcel) => {
-                    return await getParcelWithUser(parcel)
+                responseTrip.parcels.map(async (parcelId) => {
+                    return await getParcelWithUserById(parcelId)
                 })
             )
             return responseTrip
@@ -240,12 +249,14 @@ async function getTripWithDriver(trip) {
     return trip
 }
 
-async function getParcelWithUser(parcel) {
+async function getParcelWithUserById(parcelId) {
+    const parcel = await Parcel.findOne({_id: parcelId})
     const user = await User.findOne({_id: parcel.userId})
+    const responseParcel = parcel.toObject()
     user.password = null
     user.fcmTokens = []
-    parcel.user = user
-    return parcel
+    responseParcel.user = user
+    return responseParcel
 }
 
 module.exports = router

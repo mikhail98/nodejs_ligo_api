@@ -30,6 +30,7 @@ router.post('/', auth, async (req, res) => {
 
         const responseParcel = createdParcel.toObject()
         user.password = null
+        user.fcmTokens = []
         responseParcel.user = user
         res.status(200).send(responseParcel)
     } catch (error) {
@@ -51,6 +52,7 @@ router.get('/:id', auth, async (req, res) => {
 
     const responseParcel = parcel.toObject()
     user.password = null
+    user.fcmTokens = []
     responseParcel.user = user
     res.status(200).send(responseParcel)
 })
@@ -61,7 +63,7 @@ router.post('/:id/pickup', auth, async (req, res) => {
     const {tripId} = req.body
 
     const trips = await Trip.find()
-    const trip = trips.find(trip => trip.parcels.map(parcel => parcel._id.toString()).includes(parcelId))
+    const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcelId))
 
     const parcel = await Parcel.findOne({_id: parcelId})
 

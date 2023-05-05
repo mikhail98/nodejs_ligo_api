@@ -20,6 +20,7 @@ router.post('/login', async (req, res) => {
             {email_id: user.email}, "LigoTokenKey", {}
         )
         user.password = null
+        user.fcmTokens = []
         res.status(200).send(user)
     } else {
         res.status(400).send(Error.wrongPassword)
