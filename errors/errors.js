@@ -11,6 +11,7 @@ const invalidToken = createError(303, "Invalid token")
 const youNeedAdminRights = createError(304, "You need to be an admin to do that")
 const noSecretForThisParcel = createError(305, "No secret for this parcel")
 const accessDenied = createError(306, "Access denied")
+const notInYouTrip = createError(307, "This parcel is not in your trip")
 
 const driverHasActiveTrip = createError(401, "Driver has active an trip")
 const pointsAreTheSame = createError(402, "startPoint can't be equal to endPoint")
