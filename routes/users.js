@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
         user.token = jwt.sign(
             {email_id: email.toLowerCase()}, "LigoTokenKey", {}
         )
-        user.password = ""
+        user.password = null
         user.fcmTokens = []
         res.status(200).send(user)
     } catch (error) {
@@ -50,7 +50,7 @@ router.post('/', async (req, res) => {
 router.get('/', auth, async (req, res) => {
     const users = await User.find()
     users.forEach(user => {
-        user.password = ""
+        user.password = null
         user.fcmTokens = []
     })
     res.status(200).send(users)
@@ -77,7 +77,7 @@ router.get('/:id', auth, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-    user.password = ""
+    user.password = null
     user.fcmTokens = []
     res.status(200).send(user)
 })
@@ -244,8 +244,10 @@ async function getResponseTrips(trips) {
 
 async function getTripWithDriver(trip) {
     const user = await User.findOne({_id: trip.driverId})
-    user.password = ""
-    user.fcmTokens = []
+    if (user) {
+        user.password = null
+        user.fcmTokens = []
+    }
     trip.driver = user
     return trip
 }
@@ -254,8 +256,10 @@ async function getParcelWithUserById(parcelId) {
     const parcel = await Parcel.findOne({_id: parcelId})
     const user = await User.findOne({_id: parcel.userId})
     const responseParcel = parcel.toObject()
-    user.password = ""
-    user.fcmTokens = []
+    if (user) {
+        user.password = null
+        user.fcmTokens = []
+    }
     responseParcel.user = user
     return responseParcel
 }

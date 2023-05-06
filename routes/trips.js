@@ -38,7 +38,7 @@ router.post('/', auth, async (req, res) => {
         })
 
         const tripResponse = trip.toObject()
-        user.password = ""
+        user.password = null
         user.fcmTokens = []
         tripResponse.driver = user
 

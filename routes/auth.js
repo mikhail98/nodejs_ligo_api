@@ -19,7 +19,7 @@ router.post('/login', async (req, res) => {
         user.token = jwt.sign(
             {email_id: user.email}, "LigoTokenKey", {}
         )
-        user.password = ""
+        user.password = null
         user.fcmTokens = []
         res.status(200).send(user)
     } else {

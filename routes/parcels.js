@@ -21,7 +21,7 @@ router.post('/', auth, async (req, res) => {
 
         const user = await User.findOne({_id: userId})
 
-        if (user === null) {
+        if (!user) {
             return res.status(400).send(Errors.noSuchUser)
         }
 
@@ -34,7 +34,7 @@ router.post('/', auth, async (req, res) => {
         })
 
         const responseParcel = createdParcel.toObject()
-        user.password = ""
+        user.password = null
         user.fcmTokens = []
         responseParcel.user = user
         res.status(200).send(responseParcel)
@@ -51,12 +51,12 @@ router.get('/:id', auth, async (req, res) => {
     }
 
     const user = await User.findOne({_id: parcel.userId})
-    if (user === null) {
+    if (!user) {
         return res.status(400).send(Errors.noSuchUser)
     }
 
     const responseParcel = parcel.toObject()
-    user.password = ""
+    user.password = null
     user.fcmTokens = []
     responseParcel.user = user
     res.status(200).send(responseParcel)
