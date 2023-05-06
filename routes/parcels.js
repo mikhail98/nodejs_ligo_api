@@ -72,7 +72,7 @@ router.post('/:id/pickup', auth, async (req, res) => {
     }
 
     if (tripId !== trip._id.toString() && driver._id.toString() !== trip.driverId) {
-        return res.status(400).send(Errors.accessDenied)
+        return res.status(400).send(Errors.notInYouTrip)
     }
 
     parcel.status = 'PICKED'
