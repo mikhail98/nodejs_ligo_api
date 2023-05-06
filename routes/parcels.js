@@ -7,12 +7,17 @@ const Trip = require('../models/trip')
 const auth = require('../middleware/auth')
 const Errors = require("../errors/errors");
 const Socket = require("../socket/socket");
+const Error = require("../errors/errors");
 
 const router = express.Router()
 
 router.post('/', auth, async (req, res) => {
     try {
         const {userId, startPoint, endPoint, size} = req.body
+
+        if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
+            return res.status(400).send(Error.pointsAreTheSame)
+        }
 
         const user = await User.findOne({_id: userId})
 
