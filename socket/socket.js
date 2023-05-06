@@ -63,7 +63,7 @@ async function notifyDriver(driver, parcel) {
 
     const responseParcel = parcel.toObject()
     const user = await User.findOne({_id: parcel.userId})
-    user.password = null
+    user.password = ""
     user.fcmTokens = []
     responseParcel.user = user
 
@@ -121,7 +121,7 @@ async function acceptParcel(driverId, parcelId) {
         )
     )
     const user = await User.findOne({_id: driverId})
-    user.password = null
+    user.password = ""
     user.fcmTokens = []
     responseTrip.driver = user
 
@@ -141,7 +141,7 @@ async function getParcelWithUserById(parcelId) {
     const parcel = await Parcel.findOne({_id: parcelId})
     const user = await User.findOne({_id: parcel.userId})
     const responseParcel = parcel.toObject()
-    user.password = null
+    user.password = ""
     user.fcmTokens = []
     responseParcel.user = user
     return responseParcel

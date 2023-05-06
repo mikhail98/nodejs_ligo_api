@@ -34,7 +34,7 @@ router.post('/', auth, async (req, res) => {
         })
 
         const responseParcel = createdParcel.toObject()
-        user.password = null
+        user.password = ""
         user.fcmTokens = []
         responseParcel.user = user
         res.status(200).send(responseParcel)
@@ -56,7 +56,7 @@ router.get('/:id', auth, async (req, res) => {
     }
 
     const responseParcel = parcel.toObject()
-    user.password = null
+    user.password = ""
     user.fcmTokens = []
     responseParcel.user = user
     res.status(200).send(responseParcel)
