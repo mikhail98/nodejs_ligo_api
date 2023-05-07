@@ -14,7 +14,7 @@ const port = process.env.PORT || 80
 
 const socket = require('./socket/socket')
 
-const serverVersion = "1.0"
+const serverVersion = "1.1-develop"
 
 const mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/pingo?retryWrites=true&w=majority'
 
