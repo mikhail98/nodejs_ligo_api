@@ -14,6 +14,8 @@ const port = process.env.PORT || 80
 
 const socket = require('./socket/socket')
 
+const serverVersion = "1.0"
+
 const mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/pingo?retryWrites=true&w=majority'
 
 mongoose.connect(mongoUrl, {
@@ -42,6 +44,7 @@ app.use('/google', googleRouter)
 
 const server = app.listen(port, () => {
     console.log(`Server has been started at port: ${port}`)
+    console.log(`Server version: ${serverVersion}`)
 })
 
 socket.initSocket(server)
