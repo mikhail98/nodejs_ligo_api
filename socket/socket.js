@@ -50,7 +50,6 @@ async function requestDriverForParcel(parcelId) {
         .filter(trip => !existedParcel.notifiedDrivers.includes(trip.driverId))
         .map(trip => trip.driverId)
 
-    console.log(suitableDriverIds)
     const suitableDrivers = await User.find({_id: {$in: suitableDriverIds}})
     suitableDrivers.forEach(driver => notifyDriver(driver, existedParcel))
 }
