@@ -8,6 +8,7 @@ const tripsRouter = require('./routes/trips')
 const googleRouter = require('./routes/google')
 const parcelsRouter = require('./routes/parcels')
 const defaultRouter = require('./routes/default')
+const properties = require('./local/properties')
 
 const app = express()
 const port = process.env.PORT || 80
@@ -16,7 +17,7 @@ const socket = require('./socket/socket')
 
 const serverVersion = "1.1-develop"
 
-const mongoUrl = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.jfl4hmk.mongodb.net/pingo?retryWrites=true&w=majority'
+const mongoUrl = process.env.MONGODB_URL || properties.MONGODB_URL
 
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
@@ -28,7 +29,7 @@ mongoose.connect(mongoUrl, {
     })
 
 app.use(bodyParser.json())
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", '*')
     res.header('Access-Control-Allow-Methods', '*')
     res.header("Access-Control-Allow-Headers", '*')
