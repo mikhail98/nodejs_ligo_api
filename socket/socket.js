@@ -20,8 +20,8 @@ function initSocket(server) {
         socket.on('leaveSocket', (data) => {
             socket.leave(data.userId)
         })
-        socket.on('requestDriverForParcel', (data) => {
-            requestDriverForParcel(data.parcelId)
+        socket.on('requestDriverForParcel', async (data) => {
+            await requestDriverForParcel(data.parcelId)
         })
     })
 }
