@@ -37,7 +37,6 @@ async function sendPushNotifications(userId, data) {
                 resultTokens.push(null)
             }
             if (resultTokens.length === sourceTokens.length) {
-                console.log(resultTokens)
                 await User.updateOne({_id: userId}, {fcmTokens: resultTokens.filter(token => token)})
             }
         })
