@@ -62,6 +62,57 @@ router.get('/:id', auth, async (req, res) => {
     res.status(200).send(responseParcel)
 })
 
+router.post('/:id/accept', auth, async (req, res) => {
+    const driver = await User.findOne({email: req.user.email_id})
+    const parcelId = req.params.id
+    const driverId = driver._id
+    const existedParcel = await Parcel.findOne({_id: parcelId})
+    if (!existedParcel) {
+        return res.status(400).send(Error.noSuchParcel)
+    }
+    existedParcel.status = 'ACCEPTED'
+
+    const trip = await Trip.findOne({driverId, status: 'ACTIVE'})
+    if (!trip) {
+        return res.status(400).send(Error.noSuchTrip)
+    }
+    trip.parcels.push(parcelId)
+
+    await Trip.updateOne({_id: trip._id}, trip)
+    await Parcel.updateOne({_id: parcelId}, existedParcel)
+
+    const responseTrip = trip.toObject()
+    responseTrip.parcels = await Promise.all(
+        trip.parcels.map(async (parcelId) => {
+                return getParcelWithUserById(parcelId)
+            }
+        )
+    )
+    const user = await User.findOne({_id: driverId})
+    if (user) {
+        user.password = null
+        user.fcmTokens = []
+    }
+    responseTrip.driver = user
+
+    Socket.emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
+
+    res.status(200).send(existedParcel)
+})
+
+router.post('/:id/decline', auth, async (req, res) => {
+    const driver = await User.findOne({email: req.user.email_id})
+    const parcelId = req.params.id
+    const driverId = driver._id
+    const existedParcel = await Parcel.findOne({_id: parcelId})
+    if (!existedParcel) {
+        return res.status(400).send(Error.noSuchParcel)
+    }
+    existedParcel.driversBlacklist.push(driverId)
+    await Parcel.updateOne({_id: parcelId}, existedParcel)
+    res.status(200).send(existedParcel)
+})
+
 router.post('/:id/pickup', auth, async (req, res) => {
     const driver = await User.findOne({email: req.user.email_id})
     const parcelId = req.params.id
@@ -168,5 +219,18 @@ router.get('/:id/secret', auth, async (req, res) => {
 
     res.status(200).send(secret)
 })
+
+
+async function getParcelWithUserById(parcelId) {
+    const parcel = await Parcel.findOne({_id: parcelId})
+    const user = await User.findOne({_id: parcel.userId})
+    const responseParcel = parcel.toObject()
+    if (user) {
+        user.password = null
+        user.fcmTokens = []
+    }
+    responseParcel.user = user
+    return responseParcel
+}
 
 module.exports = router

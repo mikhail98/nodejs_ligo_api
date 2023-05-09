@@ -23,12 +23,6 @@ function initSocket(server) {
         socket.on('requestDriverForParcel', (data) => {
             requestDriverForParcel(data.parcelId)
         })
-        socket.on('acceptParcel', (data) => {
-            acceptParcel(data.driverId, data.parcelId)
-        })
-        socket.on('declineParcel', (data) => {
-            declineParcel(data.driverId, data.parcelId)
-        })
     })
 }
 
@@ -94,60 +88,6 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 
 function deg2rad(deg) {
     return deg * (Math.PI / 180)
-}
-
-async function acceptParcel(driverId, parcelId) {
-    const existedParcel = await Parcel.findOne({_id: parcelId})
-    if (!existedParcel) {
-        return
-    }
-    existedParcel.status = 'ACCEPTED'
-
-    const trip = await Trip.findOne({driverId, status: 'ACTIVE'})
-    if (!trip) {
-        return
-    }
-    trip.parcels.push(parcelId)
-
-    await Trip.updateOne({_id: trip._id}, trip)
-    await Parcel.updateOne({_id: parcelId}, existedParcel)
-
-    const responseTrip = trip.toObject()
-    responseTrip.parcels = await Promise.all(
-        trip.parcels.map(async (parcelId) => {
-                return getParcelWithUserById(parcelId)
-            }
-        )
-    )
-    const user = await User.findOne({_id: driverId})
-    if (user) {
-        user.password = null
-        user.fcmTokens = []
-    }
-    responseTrip.driver = user
-
-    emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
-}
-
-async function declineParcel(driverId, parcelId) {
-    const existedParcel = await Parcel.findOne({_id: parcelId})
-    if (!existedParcel) {
-        return
-    }
-    existedParcel.driversBlacklist.push(driverId)
-    await Parcel.updateOne({_id: parcelId}, existedParcel)
-}
-
-async function getParcelWithUserById(parcelId) {
-    const parcel = await Parcel.findOne({_id: parcelId})
-    const user = await User.findOne({_id: parcel.userId})
-    const responseParcel = parcel.toObject()
-    if (user) {
-        user.password = null
-        user.fcmTokens = []
-    }
-    responseParcel.user = user
-    return responseParcel
 }
 
 module.exports = {
