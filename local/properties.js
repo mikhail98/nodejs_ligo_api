@@ -1,0 +1,10 @@
+const MONGODB_URL = ''
+
+const GOOGLE_PLACES_API_KEY = ''
+const GOOGLE_DIRECTIONS_API_KEY = ''
+
+module.exports = {
+    MONGODB_URL,
+    GOOGLE_PLACES_API_KEY,
+    GOOGLE_DIRECTIONS_API_KEY
+}
