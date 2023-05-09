@@ -3,11 +3,12 @@ const Trip = require('../models/trip')
 const User = require('../models/user')
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
+const log = require('../middleware/log')
 
 const router = express.Router()
 
 //create trip
-router.post('/', auth, async (req, res) => {
+router.post('/', log, auth, async (req, res) => {
     try {
         const {driverId, startPoint, endPoint, driverLocation} = req.body
 
@@ -48,7 +49,7 @@ router.post('/', auth, async (req, res) => {
     }
 })
 
-router.post('/:id/complete', auth, async (req, res) => {
+router.post('/:id/complete', log, auth, async (req, res) => {
     const trip = await Trip.findOneAndUpdate({_id: req.params.id}, {status: 'COMPLETED'})
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)
@@ -56,7 +57,7 @@ router.post('/:id/complete', auth, async (req, res) => {
     res.status(200).send()
 })
 
-router.post('/:id/cancel', auth, async (req, res) => {
+router.post('/:id/cancel', log, auth, async (req, res) => {
     const trip = await Trip.findOneAndUpdate({_id: req.params.id}, {status: 'CANCELLED'})
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)

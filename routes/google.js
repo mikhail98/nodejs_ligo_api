@@ -1,5 +1,6 @@
 const express = require('express')
 const auth = require("../middleware/auth")
+const log = require('../middleware/log')
 const axios = require('axios')
 const properties = require("../local/properties")
 const GooglePlace = require('../models/google_place')
@@ -13,7 +14,7 @@ const directionsKey = process.env.GOOGLE_DIRECTIONS_API_KEY || properties.GOOGLE
 const PLACES_UPDATE_INTERVAL_DAYS = 14
 const DIRECTIONS_UPDATE_INTERVAL_DAYS = 14
 
-router.get('/places', auth, async (req, res) => {
+router.get('/places', log, auth, async (req, res) => {
     const text = req.query.query
 
     const result = await GooglePlace.findOne({text})
@@ -53,7 +54,7 @@ function findAndSavePlace(text, res, resultId) {
         })
 }
 
-router.get('/directions', auth, async (req, res) => {
+router.get('/directions', log, auth, async (req, res) => {
     const origin = req.query.origin
     const destination = req.query.destination
 
