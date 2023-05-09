@@ -5,13 +5,14 @@ const User = require('../models/user')
 const Secret = require('../models/secret')
 const Trip = require('../models/trip')
 const auth = require('../middleware/auth')
-const Errors = require("../errors/errors");
-const Socket = require("../socket/socket");
-const Error = require("../errors/errors");
+const log = require('../middleware/log')
+const Errors = require("../errors/errors")
+const Socket = require("../socket/socket")
+const Error = require("../errors/errors")
 
 const router = express.Router()
 
-router.post('/', auth, async (req, res) => {
+router.post('/', log, auth, async (req, res) => {
     try {
         const {userId, startPoint, endPoint, size} = req.body
 
@@ -43,7 +44,7 @@ router.post('/', auth, async (req, res) => {
     }
 })
 
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', log, auth, async (req, res) => {
     const parcel = await Parcel.findOne({_id: req.params.id})
 
     if (parcel === null) {
@@ -62,7 +63,7 @@ router.get('/:id', auth, async (req, res) => {
     res.status(200).send(responseParcel)
 })
 
-router.post('/:id/accept', auth, async (req, res) => {
+router.post('/:id/accept', log, auth, async (req, res) => {
     const driver = await User.findOne({email: req.user.email_id})
     const parcelId = req.params.id
     const driverId = driver._id
@@ -102,7 +103,7 @@ router.post('/:id/accept', auth, async (req, res) => {
     res.status(200).send(responseParcel)
 })
 
-router.post('/:id/decline', auth, async (req, res) => {
+router.post('/:id/decline', log, auth, async (req, res) => {
     const driver = await User.findOne({email: req.user.email_id})
     const parcelId = req.params.id
     const driverId = driver._id
@@ -115,7 +116,7 @@ router.post('/:id/decline', auth, async (req, res) => {
     res.status(200).send(existedParcel)
 })
 
-router.post('/:id/pickup', auth, async (req, res) => {
+router.post('/:id/pickup', log, auth, async (req, res) => {
     const driver = await User.findOne({email: req.user.email_id})
     const parcelId = req.params.id
     const {tripId} = req.body
@@ -139,7 +140,7 @@ router.post('/:id/pickup', auth, async (req, res) => {
     res.status(200).send(parcel)
 })
 
-router.post('/:id/cancel', auth, async (req, res) => {
+router.post('/:id/cancel', log, auth, async (req, res) => {
     const parcelId = req.params.id
 
     const trips = await Trip.find()
@@ -163,7 +164,7 @@ router.post('/:id/cancel', auth, async (req, res) => {
     res.status(200).send(parcel)
 })
 
-router.post('/:id/deliver', auth, async (req, res) => {
+router.post('/:id/deliver', log, auth, async (req, res) => {
     const parcelId = req.params.id
     const {secret} = req.body
 
@@ -189,7 +190,7 @@ router.post('/:id/deliver', auth, async (req, res) => {
     res.status(200).send(parcel)
 })
 
-router.post('/:id/secret', auth, async (req, res) => {
+router.post('/:id/secret', log, auth, async (req, res) => {
     const user = await User.findOne({email: req.user.email_id})
 
     const parcelId = req.params.id
@@ -207,7 +208,7 @@ router.post('/:id/secret', auth, async (req, res) => {
     }
 })
 
-router.get('/:id/secret', auth, async (req, res) => {
+router.get('/:id/secret', log, auth, async (req, res) => {
     const secret = await Secret.findOne({parcelId: req.params.id})
 
     if (secret === null) {

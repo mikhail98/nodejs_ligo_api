@@ -4,10 +4,11 @@ const User = require('../models/user')
 const Error = require('../errors/errors')
 const jwt = require("jsonwebtoken")
 const auth = require("../middleware/auth")
+const log = require('../middleware/log')
 
 const router = express.Router()
 
-router.post('/login', async (req, res) => {
+router.post('/login', log, async (req, res) => {
     const {email, password} = req.body
     const user = await User.findOne({email})
 
@@ -27,7 +28,7 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.post('/:id/logout', auth, async (req, res) => {
+router.post('/:id/logout', log, auth, async (req, res) => {
     const user = await User.findOneAndUpdate({_id: req.params.id}, {fcmToken: null})
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
@@ -38,7 +39,7 @@ router.post('/:id/logout', auth, async (req, res) => {
     res.status(200).send()
 })
 
-router.post('/:id/delete', auth, async (req, res) => {
+router.post('/:id/delete', log, auth, async (req, res) => {
     const user = await User.findByIdAndDelete({_id: req.params.id})
     if (!user) {
         return res.status(400).send(Error.noSuchUser)

@@ -5,6 +5,7 @@ const User = require('../models/user')
 const Trip = require('../models/trip')
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
+const log = require('../middleware/log')
 const socket = require('../socket/socket')
 const sendPushNotifications = require('../firebase/fcm')
 const {Parcel} = require("../models/parcel");
@@ -12,7 +13,7 @@ const {Parcel} = require("../models/parcel");
 const router = express.Router()
 
 //create user
-router.post('/', async (req, res) => {
+router.post('/', log, async (req, res) => {
     try {
         const {name, email, password, phone, isDriver, fcmToken, passportPhotoUrl, avatarUrl} = req.body
 
@@ -47,7 +48,7 @@ router.post('/', async (req, res) => {
 })
 
 //get all users
-router.get('/', auth, async (req, res) => {
+router.get('/', log, auth, async (req, res) => {
     const users = await User.find()
     users.forEach(user => {
         user.password = null
@@ -57,7 +58,7 @@ router.get('/', auth, async (req, res) => {
 })
 
 //get all drivers
-router.get('/drivers', async (req, res) => {
+router.get('/drivers', log, async (req, res) => {
     try {
         const drivers = await User.find({isDriver: true})
         drivers.forEach(driver => {
@@ -71,7 +72,7 @@ router.get('/drivers', async (req, res) => {
 })
 
 //get user by id
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', log, auth, async (req, res) => {
     const user = await User.findOne({_id: req.params.id})
 
     if (!user) {
@@ -83,7 +84,7 @@ router.get('/:id', auth, async (req, res) => {
 })
 
 //update user location
-router.patch('/:id/location', auth, async (req, res) => {
+router.patch('/:id/location', log, auth, async (req, res) => {
     const _id = req.params.id
     const {location} = req.body
     const user = await User.findOneAndUpdate({_id}, {location: location})
@@ -98,7 +99,7 @@ router.patch('/:id/location', auth, async (req, res) => {
 })
 
 //update user fcm token
-router.patch('/:id/fcmToken', auth, async (req, res) => {
+router.patch('/:id/fcmToken', log, auth, async (req, res) => {
     const _id = req.params.id
     const user = await User.findOne({_id})
     const {fcmToken} = req.body
@@ -112,7 +113,7 @@ router.patch('/:id/fcmToken', auth, async (req, res) => {
 })
 
 //update user passportPhoto
-router.patch('/:id/passportPhoto', auth, async (req, res) => {
+router.patch('/:id/passportPhoto', log, auth, async (req, res) => {
     const _id = req.params.id
     const {passportPhotoUrl} = req.body
     const user = await User.findOneAndUpdate({_id}, {passportPhotoUrl})
@@ -124,7 +125,7 @@ router.patch('/:id/passportPhoto', auth, async (req, res) => {
 })
 
 //update user avatar
-router.patch('/:id/avatar', auth, async (req, res) => {
+router.patch('/:id/avatar', log, auth, async (req, res) => {
     const _id = req.params.id
     const {avatarUrl} = req.body
     const user = await User.findOneAndUpdate({_id}, {avatarUrl})
@@ -136,7 +137,7 @@ router.patch('/:id/avatar', auth, async (req, res) => {
 })
 
 //feedback user
-router.patch('/:id/rating', auth, async (req, res) => {
+router.patch('/:id/rating', log, auth, async (req, res) => {
     const userFromEmail = req.user.email_id
     const userTo = await User.findOne({_id: req.params.id})
 
@@ -156,7 +157,7 @@ router.patch('/:id/rating', auth, async (req, res) => {
 
 
 //validate user
-router.patch('/:id/validate', auth, async (req, res) => {
+router.patch('/:id/validate', log, auth, async (req, res) => {
     const validatorEmail = req.user.email_id
     const validator = await User.findOne({email: validatorEmail})
     if (!validator.isAdmin) {
@@ -184,7 +185,7 @@ router.patch('/:id/validate', auth, async (req, res) => {
     res.status(200).send(responseUser)
 })
 
-router.get('/:id/senderParcels', auth, async (req, res) => {
+router.get('/:id/senderParcels', log, auth, async (req, res) => {
     const parcels = await Parcel.find({userId: req.params.id})
     const responseParcels = await Promise.all(
         parcels.map(async (parcelId) => {
@@ -194,12 +195,12 @@ router.get('/:id/senderParcels', auth, async (req, res) => {
     res.status(200).send(await getResponseTrips(responseParcels))
 })
 
-router.get('/:id/driverTrips', auth, async (req, res) => {
+router.get('/:id/driverTrips', log, auth, async (req, res) => {
     const trips = await Trip.find({driverId: req.params.id})
     res.status(200).send(await getResponseTrips(trips))
 })
 
-router.get('/:id/senderTrips', auth, async (req, res) => {
+router.get('/:id/senderTrips', log, auth, async (req, res) => {
     const parcels = await Parcel.find({userId: req.params.id})
 
     const trips = await Trip.find()
