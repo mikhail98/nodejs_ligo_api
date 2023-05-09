@@ -97,7 +97,9 @@ router.post('/:id/accept', auth, async (req, res) => {
 
     Socket.emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
 
-    res.status(200).send(existedParcel)
+    const responseParcel = await getParcelWithUserById(parcelId)
+
+    res.status(200).send(responseParcel)
 })
 
 router.post('/:id/decline', auth, async (req, res) => {
