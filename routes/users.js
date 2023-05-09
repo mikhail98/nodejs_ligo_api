@@ -6,7 +6,7 @@ const Trip = require('../models/trip')
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const socket = require('../socket/socket')
-const sendPushNotification = require('../firebase/push/fcm')
+const sendPushNotifications = require('../firebase/fcm')
 const {Parcel} = require("../models/parcel");
 
 const router = express.Router()
@@ -175,11 +175,9 @@ router.patch('/:id/validate', auth, async (req, res) => {
     await User.findOneAndUpdate({_id: req.params.id}, {isValidated})
     const responseUser = await User.findOne({_id: req.params.id})
     socket.emitEvent(responseUser._id.toString(), "userValidated", {isValidated})
-    responseUser.fcmTokens.forEach(token => {
-        sendPushNotification(token, {
-            key: "USER_VALIDATED",
-            isValidated: isValidated.toString()
-        })
+    await sendPushNotifications(responseUser._id, {
+        key: "USER_VALIDATED",
+        isValidated: isValidated.toString()
     })
     responseUser.password = null
     responseUser.fcmTokens = []
@@ -207,9 +205,10 @@ router.get('/:id/senderTrips', auth, async (req, res) => {
     const trips = await Trip.find()
     const responseTrips = await Promise.all(
         parcels.map(async (parcel) => {
-            if (parcel.status === "CREATED") {
+            if (parcel.status === "CREATED" || parcel.status === "CANCELLED") {
+                const parcelWithUser = await getParcelWithUserById(parcel._id)
                 return {
-                    parcels: [parcel],
+                    parcels: [parcelWithUser],
                     createdAt: parcel.createdAt
                 }
             } else {

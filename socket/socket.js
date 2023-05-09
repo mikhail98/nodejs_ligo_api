@@ -2,7 +2,7 @@ const io = require('socket.io')
 const Trip = require('../models/trip')
 const User = require('../models/user')
 const {Parcel} = require('../models/parcel')
-const sendPushNotification = require("../firebase/push/fcm")
+const sendPushNotifications = require("../firebase/fcm")
 
 const MAX_DISTANCE = 15.0
 
@@ -69,11 +69,9 @@ async function notifyDriver(driver, parcel) {
     responseParcel.user = user
 
     emitEvent(driver._id.toString(), "parcelAvailable", responseParcel)
-    driver.fcmTokens.forEach(token => {
-        sendPushNotification(token, {
-            key: "PARCEL_AVAILABLE",
-            parcel: JSON.stringify(responseParcel)
-        })
+    await sendPushNotifications(driver._id, {
+        key: "PARCEL_AVAILABLE",
+        parcel: JSON.stringify(responseParcel)
     })
 }
 
