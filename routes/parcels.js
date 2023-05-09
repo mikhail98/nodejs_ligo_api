@@ -86,6 +86,30 @@ router.post('/:id/pickup', auth, async (req, res) => {
     res.status(200).send(parcel)
 })
 
+router.post('/:id/cancel', auth, async (req, res) => {
+    const parcelId = req.params.id
+
+    const trips = await Trip.find()
+    const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcelId))
+
+    const parcel = await Parcel.findOne({_id: parcelId})
+
+    if (parcel === null) {
+        return res.status(400).send(Errors.noSuchParcel)
+    }
+
+    if (trip) {
+        return res.status(400).send(Errors.parcelInActiveTrip)
+    }
+
+    parcel.status = 'CANCELLED'
+    parcel.notifiedDrivers.forEach(driverId => {
+        Socket.emitEvent(driverId, "parcelCancelled", parcel)
+    })
+    await Parcel.updateOne({_id: parcelId}, parcel)
+    res.status(200).send(parcel)
+})
+
 router.post('/:id/deliver', auth, async (req, res) => {
     const parcelId = req.params.id
     const {secret} = req.body
