@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const pointSchema = require('../models/point')
-const ratingSchema = require('../models/rating')
+const ratingSchema = require('../models/rating').ratingSchema
 
 const userSchema = new mongoose.Schema({
     name: {

@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Trip = require('../models/trip')
+const Rating = require('../models/rating').Rating
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const log = require('../middleware/log')
@@ -138,20 +139,30 @@ router.patch('/:id/avatar', log, auth, async (req, res) => {
 
 //feedback user
 router.patch('/:id/rating', log, auth, async (req, res) => {
-    const userFromEmail = req.user.email_id
+    const validatorEmail = req.user.email_id
+    const validator = await User.findOne({email: validatorEmail})
+    const userFromId = validator._id
+
     const userTo = await User.findOne({_id: req.params.id})
 
     if (!userTo) {
         return res.status(400).send(Error.noSuchUser)
     }
+    const userToId = userTo._id
 
     const {rating} = req.body
-    if (rating.userFrom !== userFromEmail) {
-        return res.status(400).send(Error.noSuchUser)
+
+    const ratingExists = userTo.ratings.filter(rating => {
+        return rating.userFrom === userFromId.toString() && rating.userTo === userToId.toString()
+    }).length !== 0
+
+    if (ratingExists) {
+        return res.status(400).send(Error.ratingExists)
     }
 
-    userTo.ratings.push(rating)
+    userTo.ratings.push(Rating({userFrom: userFromId, userTo: userToId, rating}))
     await User.updateOne({_id: req.params.id}, userTo)
+
     res.status(200).send()
 })
 
