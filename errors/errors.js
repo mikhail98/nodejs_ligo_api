@@ -16,6 +16,7 @@ const parcelInActiveTrip = createError(307, "This parcel is in active trip")
 
 const driverHasActiveTrip = createError(401, "Driver has active an trip")
 const pointsAreTheSame = createError(402, "startPoint can't be equal to endPoint")
+const ratingExists = createError(403, "Rating exists")
 
 function createError(code, msg) {
     return {
@@ -39,5 +40,6 @@ module.exports = {
     noSecretForThisParcel,
     accessDenied,
     notInYouTrip,
-    parcelInActiveTrip
+    parcelInActiveTrip,
+    ratingExists
 }

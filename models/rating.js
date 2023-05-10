@@ -6,6 +6,11 @@ const ratingSchema = new mongoose.Schema({
         unique: false,
         required: true,
     },
+    userTo: {
+        type: String,
+        unique: false,
+        required: true,
+    },
     rating: {
         type: Number,
         unique: false,
@@ -14,4 +19,8 @@ const ratingSchema = new mongoose.Schema({
     },
 })
 
-module.exports = ratingSchema
+const Rating = mongoose.model('Rating', ratingSchema)
+
+module.exports = {
+    ratingSchema, Rating
+}
