@@ -2,7 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 
-const usersRouter = require('./routes/users')
+const usersRouter = require('./routes/users').router
 const authRouter = require('./routes/auth')
 const tripsRouter = require('./routes/trips')
 const googleRouter = require('./routes/google')

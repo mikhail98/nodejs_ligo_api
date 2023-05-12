@@ -1,6 +1,7 @@
 const io = require('socket.io')
 const Trip = require('../models/trip')
 const User = require('../models/user')
+const Users = require('../routes/users')
 const {Parcel} = require('../models/parcel')
 const sendPushNotifications = require("../firebase/fcm")
 
@@ -36,9 +37,10 @@ async function requestDriverForParcel(parcelId) {
     if (!existedParcel) {
         return
     }
-    const trips = await Trip.find({status: 'ACTIVE'})
-    const suitableDriverIds = trips
-        .filter(trip => getDistanceBetween(existedParcel.startPoint, trip.driverLocation) < MAX_DISTANCE)
+
+    const responseTrips = await Users.getResponseTrips(await Trip.find({status: 'ACTIVE'}))
+    const suitableDriverIds = responseTrips
+        .filter(trip => getDistanceBetween(existedParcel.startPoint, trip.driver.location) < MAX_DISTANCE)
         .filter(trip => getDistanceBetween(existedParcel.endPoint, trip.endPoint) < MAX_DISTANCE)
         .filter(trip => !existedParcel.driversBlacklist.includes(trip.driverId))
         .filter(trip => !existedParcel.notifiedDrivers.includes(trip.driverId))

@@ -9,7 +9,7 @@ const auth = require('../middleware/auth')
 const log = require('../middleware/log')
 const socket = require('../socket/socket')
 const sendPushNotifications = require('../firebase/fcm')
-const {Parcel} = require("../models/parcel");
+const {Parcel} = require("../models/parcel")
 
 const router = express.Router()
 
@@ -94,7 +94,13 @@ router.patch('/:id/location', log, auth, async (req, res) => {
         return res.status(400).send(Error.noSuchUser)
     }
     if (user.isDriver) {
-        await Trip.findOneAndUpdate({driver: _id, status: 'ACTIVE'}, {driverLocation: location})
+        const trip = await Trip.findOne({driver: _id, status: 'ACTIVE'})
+        if (trip) {
+            const responseTrip = await getResponseTrip(trip)
+            responseTrip.parcels.map(parcel => parcel.userId).forEach(userId => {
+                socket.emitEvent(userId, "driverLocationUpdated", location)
+            })
+        }
     }
     res.status(200).send()
 })
@@ -196,16 +202,6 @@ router.patch('/:id/validate', log, auth, async (req, res) => {
     res.status(200).send(responseUser)
 })
 
-router.get('/:id/senderParcels', log, auth, async (req, res) => {
-    const parcels = await Parcel.find({userId: req.params.id})
-    const responseParcels = await Promise.all(
-        parcels.map(async (parcelId) => {
-            return await getParcelWithUserById(parcelId)
-        })
-    )
-    res.status(200).send(await getResponseTrips(responseParcels))
-})
-
 router.get('/:id/driverTrips', log, auth, async (req, res) => {
     const trips = await Trip.find({driverId: req.params.id})
     res.status(200).send(await getResponseTrips(trips))
@@ -225,7 +221,7 @@ router.get('/:id/senderTrips', log, auth, async (req, res) => {
                 }
             } else {
                 const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcel._id.toString()))
-                const responseTrip = await getTripWithDriver(trip.toObject())
+                const responseTrip = await getTripWithDriver(trip)
                 responseTrip.parcels = await Promise.all(
                     responseTrip.parcels.filter(parcelId => parcelId === parcel._id.toString()).map(async (parcelId) => {
                         return await getParcelWithUserById(parcelId)
@@ -242,15 +238,24 @@ router.get('/:id/senderTrips', log, auth, async (req, res) => {
 async function getResponseTrips(trips) {
     return await Promise.all(
         trips.map(async (trip) => {
-            const responseTrip = await getTripWithDriver(trip.toObject())
-            responseTrip.parcels = await Promise.all(
-                responseTrip.parcels.map(async (parcelId) => {
-                    return await getParcelWithUserById(parcelId)
-                })
-            )
-            return responseTrip
+            return await getResponseTrip(trip)
         })
     )
+}
+
+async function getResponseTrip(trip) {
+    let responseTrip
+    if (trip instanceof Object) {
+        responseTrip = await getTripWithDriver(trip)
+    } else {
+        responseTrip = await getTripWithDriver(trip.toObject())
+    }
+    responseTrip.parcels = await Promise.all(
+        responseTrip.parcels.map(async (parcelId) => {
+            return await getParcelWithUserById(parcelId)
+        })
+    )
+    return responseTrip
 }
 
 async function getTripWithDriver(trip) {
@@ -275,4 +280,6 @@ async function getParcelWithUserById(parcelId) {
     return responseParcel
 }
 
-module.exports = router
+module.exports = {
+    router, getResponseTrips, getTripWithDriver, getParcelWithUserById
+}

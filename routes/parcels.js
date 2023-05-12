@@ -9,6 +9,7 @@ const log = require('../middleware/log')
 const Errors = require("../errors/errors")
 const Socket = require("../socket/socket")
 const Error = require("../errors/errors")
+const Users = require("../routes/users")
 
 const router = express.Router()
 
@@ -34,7 +35,7 @@ router.post('/', log, auth, async (req, res) => {
             status: 'CREATED'
         })
 
-        const responseParcel = createdParcel.toObject()
+        const responseParcel = await Users.getParcelWithUserById(createdParcel._id)
         user.password = null
         user.fcmTokens = []
         responseParcel.user = user
@@ -85,7 +86,7 @@ router.post('/:id/accept', log, auth, async (req, res) => {
     const responseTrip = trip.toObject()
     responseTrip.parcels = await Promise.all(
         trip.parcels.map(async (parcelId) => {
-                return getParcelWithUserById(parcelId)
+                return await Users.getParcelWithUserById(parcelId)
             }
         )
     )
@@ -98,7 +99,7 @@ router.post('/:id/accept', log, auth, async (req, res) => {
 
     Socket.emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
 
-    const responseParcel = await getParcelWithUserById(parcelId)
+    const responseParcel = await Users.getParcelWithUserById(parcelId)
 
     res.status(200).send(responseParcel)
 })
@@ -222,18 +223,5 @@ router.get('/:id/secret', log, auth, async (req, res) => {
 
     res.status(200).send(secret)
 })
-
-
-async function getParcelWithUserById(parcelId) {
-    const parcel = await Parcel.findOne({_id: parcelId})
-    const user = await User.findOne({_id: parcel.userId})
-    const responseParcel = parcel.toObject()
-    if (user) {
-        user.password = null
-        user.fcmTokens = []
-    }
-    responseParcel.user = user
-    return responseParcel
-}
 
 module.exports = router
