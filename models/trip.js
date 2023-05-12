@@ -14,10 +14,6 @@ const tripSchema = new mongoose.Schema({
         type: pointSchema,
         required: true,
     },
-    driverLocation: {
-        type: pointSchema,
-        required: true,
-    },
     status: {
         type: String,
         enum: ['ACTIVE', 'COMPLETED', 'CANCELLED'],
