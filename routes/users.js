@@ -10,6 +10,7 @@ const log = require('../middleware/log')
 const socket = require('../socket/socket')
 const sendPushNotifications = require('../firebase/fcm')
 const {Parcel} = require("../models/parcel")
+const Extensions = require('../utils/extensions')
 
 const router = express.Router()
 
@@ -96,7 +97,7 @@ router.patch('/:id/location', log, auth, async (req, res) => {
     if (user.isDriver) {
         const trip = await Trip.findOne({driver: _id, status: 'ACTIVE'})
         if (trip) {
-            const responseTrip = await getResponseTrip(trip)
+            const responseTrip = await Extensions.getResponseTrip(trip._id)
             responseTrip.parcels.map(parcel => parcel.userId).forEach(userId => {
                 socket.emitEvent(userId, "driverLocationUpdated", location)
             })
@@ -204,7 +205,7 @@ router.patch('/:id/validate', log, auth, async (req, res) => {
 
 router.get('/:id/driverTrips', log, auth, async (req, res) => {
     const trips = await Trip.find({driverId: req.params.id})
-    res.status(200).send(await getResponseTrips(trips))
+    res.status(200).send(await Extensions.getResponseTripsById(trips.map(trip => trip._id)))
 })
 
 router.get('/:id/senderTrips', log, auth, async (req, res) => {
@@ -214,70 +215,18 @@ router.get('/:id/senderTrips', log, auth, async (req, res) => {
     const responseTrips = await Promise.all(
         parcels.map(async (parcel) => {
             if (parcel.status === "CREATED" || parcel.status === "CANCELLED") {
-                const parcelWithUser = await getParcelWithUserById(parcel._id)
+                const parcelWithUser = await Extensions.getResponseParcelById(parcel._id)
                 return {
                     parcels: [parcelWithUser],
                     createdAt: parcel.createdAt
                 }
             } else {
                 const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcel._id.toString()))
-                const responseTrip = await getTripWithDriver(trip)
-                responseTrip.parcels = await Promise.all(
-                    responseTrip.parcels.filter(parcelId => parcelId === parcel._id.toString()).map(async (parcelId) => {
-                        return await getParcelWithUserById(parcelId)
-                    })
-                )
-
-                return responseTrip
+                return await Extensions.getResponseTripById(trip._id)
             }
         })
     )
     res.status(200).send(responseTrips)
 })
-
-async function getResponseTrips(trips) {
-    return await Promise.all(
-        trips.map(async (trip) => {
-            return await getResponseTrip(trip)
-        })
-    )
-}
-
-async function getResponseTrip(trip) {
-    let responseTrip
-    if (trip instanceof Object) {
-        responseTrip = await getTripWithDriver(trip)
-    } else {
-        responseTrip = await getTripWithDriver(trip.toObject())
-    }
-    responseTrip.parcels = await Promise.all(
-        responseTrip.parcels.map(async (parcelId) => {
-            return await getParcelWithUserById(parcelId)
-        })
-    )
-    return responseTrip
-}
-
-async function getTripWithDriver(trip) {
-    const user = await User.findOne({_id: trip.driverId})
-    if (user) {
-        user.password = null
-        user.fcmTokens = []
-    }
-    trip.driver = user
-    return trip
-}
-
-async function getParcelWithUserById(parcelId) {
-    const parcel = await Parcel.findOne({_id: parcelId})
-    const user = await User.findOne({_id: parcel.userId})
-    const responseParcel = parcel.toObject()
-    if (user) {
-        user.password = null
-        user.fcmTokens = []
-    }
-    responseParcel.user = user
-    return responseParcel
-}
 
 module.exports = router
