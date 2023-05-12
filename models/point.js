@@ -16,6 +16,11 @@ const pointSchema = new mongoose.Schema({
         unique: false,
         required: false,
     },
+    name: {
+        type: String,
+        unique: false,
+        required: false,
+    },
     address: {
         type: String,
         unique: false,
