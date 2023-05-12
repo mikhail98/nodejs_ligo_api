@@ -97,7 +97,7 @@ router.patch('/:id/location', log, auth, async (req, res) => {
     if (user.isDriver) {
         const trip = await Trip.findOne({driver: _id, status: 'ACTIVE'})
         if (trip) {
-            const responseTrip = await Extensions.getResponseTrip(trip._id)
+            const responseTrip = await Extensions.getResponseTripById(trip._id)
             responseTrip.parcels.map(parcel => parcel.userId).forEach(userId => {
                 socket.emitEvent(userId, "driverLocationUpdated", location)
             })
