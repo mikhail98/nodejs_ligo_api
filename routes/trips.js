@@ -10,7 +10,7 @@ const router = express.Router()
 //create trip
 router.post('/', log, auth, async (req, res) => {
     try {
-        const {driverId, startPoint, endPoint, driverLocation} = req.body
+        const {driverId, startPoint, endPoint} = req.body
 
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
@@ -33,7 +33,6 @@ router.post('/', log, auth, async (req, res) => {
             driverId: driverId,
             startPoint: startPoint,
             endPoint: endPoint,
-            driverLocation: driverLocation,
             status: 'ACTIVE',
             parcels: []
         })
