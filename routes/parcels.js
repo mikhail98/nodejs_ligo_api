@@ -9,6 +9,7 @@ const log = require('../middleware/log')
 const Errors = require("../errors/errors")
 const Socket = require("../socket/socket")
 const Error = require("../errors/errors")
+const Extensions = require('../utils/extensions')
 
 const router = express.Router()
 
@@ -34,7 +35,7 @@ router.post('/', log, auth, async (req, res) => {
             status: 'CREATED'
         })
 
-        const responseParcel = await getParcelWithUserById(createdParcel._id)
+        const responseParcel = await Extensions.getResponseParcelById(createdParcel._id)
         user.password = null
         user.fcmTokens = []
         responseParcel.user = user
@@ -85,7 +86,7 @@ router.post('/:id/accept', log, auth, async (req, res) => {
     const responseTrip = trip.toObject()
     responseTrip.parcels = await Promise.all(
         trip.parcels.map(async (parcelId) => {
-                return await getParcelWithUserById(parcelId)
+                return await Extensions.getResponseParcelById(parcelId)
             }
         )
     )
@@ -98,7 +99,7 @@ router.post('/:id/accept', log, auth, async (req, res) => {
 
     Socket.emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
 
-    const responseParcel = await getParcelWithUserById(parcelId)
+    const responseParcel = await Extensions.getResponseParcelById(parcelId)
 
     res.status(200).send(responseParcel)
 })
@@ -222,50 +223,5 @@ router.get('/:id/secret', log, auth, async (req, res) => {
 
     res.status(200).send(secret)
 })
-
-async function getResponseTrips(trips) {
-    return await Promise.all(
-        trips.map(async (trip) => {
-            return await getResponseTrip(trip)
-        })
-    )
-}
-
-async function getResponseTrip(trip) {
-    let responseTrip
-    if (trip instanceof Object) {
-        responseTrip = await getTripWithDriver(trip)
-    } else {
-        responseTrip = await getTripWithDriver(trip.toObject())
-    }
-    responseTrip.parcels = await Promise.all(
-        responseTrip.parcels.map(async (parcelId) => {
-            return await getParcelWithUserById(parcelId)
-        })
-    )
-    return responseTrip
-}
-
-async function getTripWithDriver(trip) {
-    const user = await User.findOne({_id: trip.driverId})
-    if (user) {
-        user.password = null
-        user.fcmTokens = []
-    }
-    trip.driver = user
-    return trip
-}
-
-async function getParcelWithUserById(parcelId) {
-    const parcel = await Parcel.findOne({_id: parcelId})
-    const user = await User.findOne({_id: parcel.userId})
-    const responseParcel = parcel.toObject()
-    if (user) {
-        user.password = null
-        user.fcmTokens = []
-    }
-    responseParcel.user = user
-    return responseParcel
-}
 
 module.exports = router
