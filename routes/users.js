@@ -280,6 +280,4 @@ async function getParcelWithUserById(parcelId) {
     return responseParcel
 }
 
-module.exports = {
-    router, getResponseTrips, getTripWithDriver, getParcelWithUserById
-}
+module.exports = router
