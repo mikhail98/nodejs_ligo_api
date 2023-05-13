@@ -10,6 +10,7 @@ const Errors = require("../errors/errors")
 const Socket = require("../socket/socket")
 const Error = require("../errors/errors")
 const Extensions = require('../utils/extensions')
+const sendPushNotifications = require('../firebase/fcm')
 
 const router = express.Router()
 
@@ -98,6 +99,10 @@ router.post('/:id/accept', log, auth, async (req, res) => {
     responseTrip.driver = user
 
     Socket.emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
+    await sendPushNotifications(existedParcel.userId, {
+        key: "PARCEL_ACCEPTED",
+        trip: JSON.stringify(responseTrip)
+    })
 
     const responseParcel = await Extensions.getResponseParcelById(parcelId)
 
@@ -137,6 +142,10 @@ router.post('/:id/pickup', log, auth, async (req, res) => {
 
     parcel.status = 'PICKED'
     Socket.emitEvent(parcel.userId, "parcelPicked", parcel)
+    await sendPushNotifications(parcel.userId, {
+        key: "PARCEL_PICKED",
+        parcel: JSON.stringify(parcel)
+    })
     await Parcel.updateOne({_id: parcelId}, parcel)
     res.status(200).send(parcel)
 })
@@ -187,6 +196,11 @@ router.post('/:id/deliver', log, auth, async (req, res) => {
 
     parcel.status = 'DELIVERED'
     Socket.emitEvent(parcel.userId, "parcelDelivered", parcel)
+    await sendPushNotifications(parcel.userId, {
+        key: "PARCEL_DELIVERED",
+        parcel: JSON.stringify(parcel)
+    })
+
     await Parcel.updateOne({_id: parcelId}, parcel)
     res.status(200).send(parcel)
 })
