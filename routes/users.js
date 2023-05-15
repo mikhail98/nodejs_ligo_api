@@ -222,7 +222,10 @@ router.get('/:id/senderTrips', log, auth, async (req, res) => {
                 }
             } else {
                 const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcel._id.toString()))
-                return await Extensions.getResponseTripById(trip._id)
+                const responseTrip = await Extensions.getResponseTripById(trip._id)
+                responseTrip.parcels = responseTrip.parcels
+                    .filter(tripParcel => tripParcel._id.toString() === parcel._id.toString())
+                return responseTrip
             }
         })
     )
