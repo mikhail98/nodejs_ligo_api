@@ -68,7 +68,7 @@ async function notifyDriver(driver, parcel) {
     emitEvent(driver._id.toString(), "parcelAvailable", responseParcel)
     await sendPushNotifications(driver._id, {
         key: "PARCEL_AVAILABLE",
-        parcel: JSON.stringify(responseParcel)
+        parcelId: responseParcel._id
     })
 }
 
