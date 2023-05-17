@@ -101,7 +101,7 @@ router.post('/:id/accept', log, auth, async (req, res) => {
     Socket.emitEvent(existedParcel.userId, 'parcelAccepted', responseTrip)
     await sendPushNotifications(existedParcel.userId, {
         key: "PARCEL_ACCEPTED",
-        parcelId: parcelId
+        parcelId: parcelId.toString()
     })
 
     const responseParcel = await Extensions.getResponseParcelById(parcelId)
@@ -144,7 +144,7 @@ router.post('/:id/pickup', log, auth, async (req, res) => {
     Socket.emitEvent(parcel.userId, "parcelPicked", parcel)
     await sendPushNotifications(parcel.userId, {
         key: "PARCEL_PICKED",
-        parcelId: parcelId
+        parcelId: parcelId.toString()
     })
     await Parcel.updateOne({_id: parcelId}, parcel)
     res.status(200).send(parcel)
@@ -198,7 +198,7 @@ router.post('/:id/deliver', log, auth, async (req, res) => {
     Socket.emitEvent(parcel.userId, "parcelDelivered", parcel)
     await sendPushNotifications(parcel.userId, {
         key: "PARCEL_DELIVERED",
-        parcelId: parcelId
+        parcelId: parcelId.toString()
     })
 
     await Parcel.updateOne({_id: parcelId}, parcel)
