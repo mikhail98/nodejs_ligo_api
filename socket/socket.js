@@ -41,6 +41,7 @@ async function requestDriverForParcel(parcelId) {
     const trips = await Trip.find({status: 'ACTIVE'})
     const responseTrips = await Extensions.getResponseTripsById(trips.map(trip => trip._id))
     const suitableDriverIds = responseTrips
+        .filter(trip => trip.driver)
         .filter(trip => getDistanceBetween(existedParcel.startPoint, trip.driver.location) < MAX_DISTANCE)
         .filter(trip => getDistanceBetween(existedParcel.endPoint, trip.endPoint) < MAX_DISTANCE)
         .filter(trip => !existedParcel.driversBlacklist.includes(trip.driverId))
