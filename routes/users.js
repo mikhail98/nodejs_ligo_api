@@ -8,7 +8,7 @@ const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const log = require('../middleware/log')
 const socket = require('../socket/socket')
-const sendPushNotifications = require('../firebase/fcm')
+const sendPushNotifications = require("../firebase/fcm")
 const {Parcel} = require("../models/parcel")
 const Extensions = require('../utils/extensions')
 
@@ -95,12 +95,21 @@ router.patch('/:id/location', log, auth, async (req, res) => {
         return res.status(400).send(Error.noSuchUser)
     }
     if (user.isDriver) {
-        const trip = await Trip.findOne({driver: _id, status: 'ACTIVE'})
+        const trip = await Trip.findOne({driverId: _id, status: 'ACTIVE'})
         if (trip) {
             const responseTrip = await Extensions.getResponseTripById(trip._id)
             responseTrip.parcels.map(parcel => parcel.userId).forEach(userId => {
                 socket.emitEvent(userId, "driverLocationUpdated", location)
             })
+
+            const parcels = await Parcel.find({status: 'CREATED'})
+            const parcelIds = parcels.map(parcel => parcel._id.toString())
+
+            Promise.allSettled(parcelIds.map(parcelId => Extensions.requestDriverForParcel(parcelId)))
+                .then(() => {
+                })
+                .catch(() => {
+                })
         }
     }
     res.status(200).send()
