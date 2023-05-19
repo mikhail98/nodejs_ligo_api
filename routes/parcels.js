@@ -10,7 +10,7 @@ const Errors = require("../errors/errors")
 const Socket = require("../socket/socket")
 const Error = require("../errors/errors")
 const Extensions = require('../utils/extensions')
-const sendPushNotifications = require('../firebase/fcm')
+const sendPushNotifications = require("../firebase/fcm")
 
 const router = express.Router()
 
