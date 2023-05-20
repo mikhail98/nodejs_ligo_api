@@ -98,9 +98,10 @@ router.patch('/:id/location', log, auth, async (req, res) => {
         const trip = await Trip.findOne({driverId: _id, status: 'ACTIVE'})
         if (trip) {
             const responseTrip = await Extensions.getResponseTripById(trip._id)
-            responseTrip.parcels.map(parcel => parcel.userId).forEach(userId => {
-                socket.emitEvent(userId, "driverLocationUpdated", location)
-            })
+            responseTrip.parcels
+                .filter(parcel => parcel.status === 'ACCEPTED' || parcel.status === 'PICKED')
+                .map(parcel => parcel.userId)
+                .forEach(userId => socket.emitEvent(userId, "driverLocationUpdated", location))
 
             const parcels = await Parcel.find({status: 'CREATED'})
             const parcelIds = parcels.map(parcel => parcel._id.toString())
