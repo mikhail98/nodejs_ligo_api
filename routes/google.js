@@ -81,10 +81,11 @@ function findAndSaveDirection(origin, destination, res, resultId) {
             const data = response.data
 
             const route = data.routes[0]
+            const legs = route.legs[0]
             const jsonToSave = {
                 points: route.overview_polyline.points,
-                distance: route.legs[0].distance.value / 1000,
-                duration: route.legs[0].duration.value,
+                distance: legs.distance.value / 1000,
+                duration: legs.duration.value
             }
 
             const dataString = JSON.stringify(jsonToSave)
@@ -94,10 +95,12 @@ function findAndSaveDirection(origin, destination, res, resultId) {
                 GoogleDirection.create({
                     origin: origin,
                     destination: destination,
-                    response: dataString
+                    response: dataString,
+                    startAddress: legs.start_address,
+                    endAddress: legs.end_address,
                 })
             }
-            return res.status(200).send(jsonToSave)
+            return res.status(200).send(dataString)
         })
         .catch(error => {
             return res.status(400).send(error)
