@@ -79,7 +79,15 @@ function findAndSaveDirection(origin, destination, res, resultId) {
     axios.get(url)
         .then(response => {
             const data = response.data
-            const dataString = JSON.stringify(data)
+
+            const route = data.routes[0]
+            const jsonToSave = {
+                points: route.overview_polyline.points,
+                distance: route.legs[0].distance.value / 1000,
+                duration: route.legs[0].duration.value,
+            }
+
+            const dataString = JSON.stringify(jsonToSave)
             if (resultId) {
                 GoogleDirection.updateOne({_id: resultId}, {response: dataString})
             } else {
@@ -89,7 +97,7 @@ function findAndSaveDirection(origin, destination, res, resultId) {
                     response: dataString
                 })
             }
-            return res.status(200).send(data)
+            return res.status(200).send(jsonToSave)
         })
         .catch(error => {
             return res.status(400).send(error)
