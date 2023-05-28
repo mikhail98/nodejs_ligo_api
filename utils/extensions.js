@@ -103,6 +103,10 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
 
+function getAvailableCurrencies() {
+    return ['PLN', 'USD', 'EUR']
+}
+
 module.exports = {
-    getResponseTripsById, getResponseTripById, getResponseParcelById, requestDriverForParcel
+    getResponseTripsById, getResponseTripById, getResponseParcelById, requestDriverForParcel, getAvailableCurrencies
 }

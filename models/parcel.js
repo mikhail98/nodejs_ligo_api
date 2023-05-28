@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const pointSchema = require("../models/point")
+const priceSchema = require("../models/price")
 
 const parcelSchema = new mongoose.Schema({
     userId: {
@@ -38,6 +39,17 @@ const parcelSchema = new mongoose.Schema({
         enum: ['CREATED', 'ACCEPTED', 'PICKED', 'DELIVERED', 'CANCELLED'],
         unique: false,
         required: true
+    },
+    givingPeriod: [{
+        type: String,
+        enum: ['MORNING', 'DAY', 'EVENING', 'NIGHT'],
+        unique: false,
+        required: true
+    }],
+    price: {
+        type: priceSchema,
+        unique: false,
+        required: true,
     }
 }, {timestamps: true})
 
