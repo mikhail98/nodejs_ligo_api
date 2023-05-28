@@ -85,6 +85,13 @@ router.get('/:id', log, auth, async (req, res) => {
     res.status(200).send(user)
 })
 
+router.post('/exists', log, async (req, res) => {
+    const {email} = req.body
+    const user = await User.findOne({email})
+
+    return res.status(200).send({userExists: user !== null})
+})
+
 //update user location
 router.patch('/:id/location', log, auth, async (req, res) => {
     const _id = req.params.id
