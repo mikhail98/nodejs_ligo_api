@@ -1,6 +1,6 @@
 const express = require('express')
 
-const {Parcel} = require('../models/parcel')
+const Parcel = require('../models/parcel')
 const User = require('../models/user')
 const Secret = require('../models/secret')
 const Trip = require('../models/trip')
@@ -33,7 +33,12 @@ router.post('/', log, auth, async (req, res) => {
             startPoint: startPoint,
             endPoint: endPoint,
             size: size,
-            status: 'CREATED'
+            status: 'CREATED',
+            givingPeriods: ['MORNING', 'DAY', 'EVENING', 'NIGHT'],
+            price: {
+                value: 228,
+                currency: "USD"
+            }
         })
 
         const responseParcel = await Extensions.getResponseParcelById(createdParcel._id)

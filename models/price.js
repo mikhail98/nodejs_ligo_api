@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Extensions = require('../utils/extensions')
+const Config = require("../utils/config")
 
 const priceSchema = new mongoose.Schema({
     value: {
@@ -9,7 +9,7 @@ const priceSchema = new mongoose.Schema({
     },
     currency: {
         type: String,
-        enum: Extensions.getAvailableCurrencies(),
+        enum: Config.getAvailableCurrencies(),
         unique: false,
         required: true,
     }

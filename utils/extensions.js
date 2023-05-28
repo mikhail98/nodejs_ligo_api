@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const Trip = require("../models/trip");
 const socket = require('../socket/socket')
-const {Parcel} = require("../models/parcel");
+const Parcel = require("../models/parcel");
 const sendPushNotifications = require("../firebase/fcm");
 
 const MAX_DISTANCE = 15.0
@@ -103,10 +103,6 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
 
-function getAvailableCurrencies() {
-    return ['PLN', 'USD', 'EUR']
-}
-
 module.exports = {
-    getResponseTripsById, getResponseTripById, getResponseParcelById, requestDriverForParcel, getAvailableCurrencies
+    getResponseTripsById, getResponseTripById, getResponseParcelById, requestDriverForParcel
 }

@@ -18,9 +18,9 @@ const parcelSchema = new mongoose.Schema({
         unique: false,
         required: true,
     },
-    size: {
+    types: {
         type: String,
-        enum: ['XS', 'S', 'M', 'L', 'XL'],
+        enum: ['SMALL_BOX', 'BOX', 'BIG_BOX', 'DOCUMENTS', 'LARGE_ITEM'],
         unique: false,
         required: true
     },
@@ -40,7 +40,7 @@ const parcelSchema = new mongoose.Schema({
         unique: false,
         required: true
     },
-    givingPeriod: [{
+    givingPeriods: [{
         type: String,
         enum: ['MORNING', 'DAY', 'EVENING', 'NIGHT'],
         unique: false,
@@ -55,6 +55,4 @@ const parcelSchema = new mongoose.Schema({
 
 const Parcel = mongoose.model('Parcel', parcelSchema)
 
-module.exports = {
-    Parcel, parcelSchema
-}
+module.exports = Parcel

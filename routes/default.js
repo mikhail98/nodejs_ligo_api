@@ -1,6 +1,6 @@
 const express = require('express')
 const log = require('../middleware/log')
-const Extensions = require("../utils/extensions");
+const Config = require("../utils/config");
 
 const router = express.Router()
 
@@ -9,7 +9,7 @@ router.get('/', log, async (req, res) => {
 })
 
 router.get('/config', log, async (req, res) => {
-    res.status(200).send({currencies: Extensions.getAvailableCurrencies()})
+    res.status(200).send({currencies: Config.getAvailableCurrencies()})
 })
 
 module.exports = router

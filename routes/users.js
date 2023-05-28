@@ -3,13 +3,13 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Trip = require('../models/trip')
+const Parcel = require("../models/parcel")
 const Rating = require('../models/rating').Rating
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const log = require('../middleware/log')
 const socket = require('../socket/socket')
 const sendPushNotifications = require("../firebase/fcm")
-const {Parcel} = require("../models/parcel")
 const Extensions = require('../utils/extensions')
 
 const router = express.Router()
@@ -32,7 +32,7 @@ router.post('/', log, async (req, res) => {
             password: encryptedPassword,
             phone: phone,
             isDriver: isDriver,
-            isValidated: !isDriver,
+            isValidated: true,
             fcmTokens: [fcmToken],
             passportPhotoUrl: passportPhotoUrl,
             avatarUrl: avatarUrl,
