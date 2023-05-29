@@ -2,9 +2,11 @@ const MONGODB_URL = 'mongodb+srv://yrshvchstudio:nnAzaZwpALAOIyEB@pingocluster.j
 
 const GOOGLE_PLACES_API_KEY = 'AIzaSyCSlmptrgECqtpqHpw1y7CzaqQWzMWUgto'
 const GOOGLE_DIRECTIONS_API_KEY = 'AIzaSyCx1eNQu54zl1ASzX5qu5CzjuPMF6FgC8w'
+const GOOGLE_SHEETS_API_KEY = 'AIzaSyCkWEudpATiJ-4V74wJ1Tjqjwo19DZdInU'
 
 module.exports = {
     MONGODB_URL,
     GOOGLE_PLACES_API_KEY,
-    GOOGLE_DIRECTIONS_API_KEY
+    GOOGLE_DIRECTIONS_API_KEY,
+    GOOGLE_SHEETS_API_KEY
 }

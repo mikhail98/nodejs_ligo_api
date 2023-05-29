@@ -26,7 +26,7 @@ const googleDirectionSchema = new mongoose.Schema({
         unique: false,
         required: false,
     }
-})
+}, {timestamps: true})
 
 const GoogleDirection = mongoose.model('GoogleDirection', googleDirectionSchema)
 
