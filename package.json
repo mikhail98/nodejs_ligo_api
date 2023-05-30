@@ -21,6 +21,7 @@
     "firebase-admin": "^11.5.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.2",
+    "node-cron": "^3.0.2",
     "socket.io": "^4.6.1"
   },
   "repository": {

@@ -1,4 +1,5 @@
 const express = require('express')
+const cron = require('node-cron')
 const Trip = require('../models/trip')
 const User = require('../models/user')
 const Error = require('../errors/errors')
@@ -10,7 +11,7 @@ const router = express.Router()
 //create trip
 router.post('/', log, auth, async (req, res) => {
     try {
-        const {driverId, startPoint, endPoint} = req.body
+        const {driverId, startPoint, endPoint, date} = req.body
 
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
@@ -24,18 +25,30 @@ router.post('/', log, auth, async (req, res) => {
             return res.status(400).send(Error.notADriver)
         }
 
-        const activeTrip = await Trip.findOne({driverId: driverId, status: 'ACTIVE'})
+        const activeTrip = await Trip.findOne({driverId, status: {$in: ['ACTIVE', 'SCHEDULED']}})
         if (activeTrip !== null) {
             return res.status(400).send(Error.driverHasActiveTrip)
         }
 
-        const trip = await Trip.create({
-            driverId: driverId,
-            startPoint: startPoint,
-            endPoint: endPoint,
-            status: 'ACTIVE',
-            parcels: []
-        })
+        let status
+        if (date) {
+            status = 'SCHEDULED'
+        } else {
+            status = 'ACTIVE'
+        }
+
+        const trip = await Trip.create({driverId, startPoint, endPoint, status, parcels: []})
+
+        if (date) {
+            const second = date.second
+            const minute = date.minute
+            const hour = date.hour
+            const day = date.day
+            const month = date.month
+            cron.schedule(`${second} ${minute} ${hour} ${day} ${month} *`, () => {
+                console.log(`Send push to ${driverId}`)
+            })
+        }
 
         const tripResponse = trip.toObject()
         user.password = null

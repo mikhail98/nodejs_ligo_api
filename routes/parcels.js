@@ -16,7 +16,7 @@ const router = express.Router()
 
 router.post('/', log, auth, async (req, res) => {
     try {
-        const {userId, startPoint, endPoint, size} = req.body
+        const {userId, startPoint, endPoint, size, weight} = req.body
 
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
@@ -34,11 +34,11 @@ router.post('/', log, auth, async (req, res) => {
             endPoint: endPoint,
             size: size,
             status: 'CREATED',
-            givingPeriods: ['MORNING', 'DAY', 'EVENING', 'NIGHT'],
             price: {
                 value: 228,
                 currency: "USD"
-            }
+            },
+            weight: weight
         })
 
         const responseParcel = await Extensions.getResponseParcelById(createdParcel._id)
@@ -80,7 +80,7 @@ router.post('/:id/accept', log, auth, async (req, res) => {
     }
     existedParcel.status = 'ACCEPTED'
 
-    const trip = await Trip.findOne({driverId, status: 'ACTIVE'})
+    const trip = await Trip.findOne({driverId, status: {$in: ['ACTIVE', 'SCHEDULED']}})
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)
     }

@@ -40,16 +40,15 @@ const parcelSchema = new mongoose.Schema({
         unique: false,
         required: true
     },
-    givingPeriods: [{
-        type: String,
-        enum: ['MORNING', 'DAY', 'EVENING', 'NIGHT'],
-        unique: false,
-        required: true
-    }],
     price: {
         type: priceSchema,
         unique: false,
         required: true,
+    },
+    weight: {
+        type: Number,
+        unique: false,
+        required: false,
     }
 }, {timestamps: true})
 

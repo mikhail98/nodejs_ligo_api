@@ -110,7 +110,7 @@ function findAndSaveDirection(origin, destination, res, resultId) {
         })
 }
 
-router.get('/localization', log, auth, async (req, res) => {
+router.get('/localization', log, async (req, res) => {
     await updateLocalisation(res, LOCALIZATION_UPDATE_INTERVAL_DAYS)
 })
 
@@ -160,10 +160,10 @@ function findAndSaveLocalization(res, resultId) {
 
 function mapLocalizationFromValues(keys, values) {
     const localizationKey = values[0]
-    values.splice(0, 1)
     const localizationValues = values.map((value, index) => {
         return {key: keys[index], value: value}
     })
+    localizationValues.splice(0, 1)
     return {
         locale: localizationKey,
         keys: localizationValues

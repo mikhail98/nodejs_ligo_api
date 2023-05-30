@@ -102,7 +102,7 @@ router.patch('/:id/location', log, auth, async (req, res) => {
         return res.status(400).send(Error.noSuchUser)
     }
     if (user.isDriver) {
-        const trip = await Trip.findOne({driverId: _id, status: 'ACTIVE'})
+        const trip = await Trip.findOne({driverId: _id, status: {$in: ['ACTIVE', 'SCHEDULED']}})
         if (trip) {
             const responseTrip = await Extensions.getResponseTripById(trip._id)
             responseTrip.parcels

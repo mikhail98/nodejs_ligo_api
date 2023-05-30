@@ -44,7 +44,7 @@ async function requestDriverForParcel(parcelId) {
             return
         }
 
-        const trips = await Trip.find({status: 'ACTIVE'})
+        const trips = await Trip.find({status: {$in: ['ACTIVE', 'SCHEDULED']}})
         const responseTrips = await getResponseTripsById(trips.map(trip => trip._id))
         const suitableDriverIds = responseTrips
             .filter(trip => trip.driver)
