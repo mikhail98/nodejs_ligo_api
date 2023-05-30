@@ -34,6 +34,7 @@ router.post('/', log, auth, async (req, res) => {
             endPoint: endPoint,
             size: size,
             status: 'CREATED',
+            types: ['BIG_BOX'],
             price: {
                 value: 228,
                 currency: "USD"

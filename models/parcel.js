@@ -18,12 +18,12 @@ const parcelSchema = new mongoose.Schema({
         unique: false,
         required: true,
     },
-    types: {
+    types: [{
         type: String,
         enum: ['SMALL_BOX', 'BOX', 'BIG_BOX', 'DOCUMENTS', 'LARGE_ITEM'],
         unique: false,
         required: true
-    },
+    }],
     notifiedDrivers: [{
         type: String,
         unique: false,

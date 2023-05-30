@@ -110,7 +110,7 @@ function findAndSaveDirection(origin, destination, res, resultId) {
         })
 }
 
-router.get('/localization', log, async (req, res) => {
+router.get('/localization', log, auth, async (req, res) => {
     await updateLocalisation(res, LOCALIZATION_UPDATE_INTERVAL_DAYS)
 })
 
@@ -127,7 +127,7 @@ async function updateLocalisation(res, interval) {
         if (timeDifference / 86_400_000 >= interval) {
             findAndSaveLocalization(res, result._id)
         } else {
-            res.status(200).send(result)
+            res.status(200).send(result.localization)
         }
     } else {
         findAndSaveLocalization(res)
@@ -138,24 +138,26 @@ function findAndSaveLocalization(res, resultId) {
     const url = 'https://sheets.googleapis.com/v4/spreadsheets/1Ln_RLoDZYsoPXoVjJIiOqJUb5hu1vpj0AKWrwsn5xss/values/A1:F1000?majorDimension=COLUMNS&key=' + sheetsKey
 
     axios.get(url)
-        .then(response => {
-            const data = response.data
-            const keys = data.values[0]
-            const values = data.values
-            values.splice(0, 1)
-            const localizations = values.map(value => mapLocalizationFromValues(keys, value))
-
-            if (resultId) {
-                GoogleLocalization.updateOne({_id: resultId}, localizations)
-            } else {
-                GoogleLocalization.create({localization: localizations})
-            }
-            return res.status(200).send(localizations)
-        })
+        .then(response => updateExistedLocalization(response, resultId, res))
         .catch(error => {
             console.log(error)
             return res.status(400).send(error)
         })
+}
+
+async function updateExistedLocalization(response, resultId, res) {
+    const data = response.data
+    const keys = data.values[0]
+    const values = data.values
+    values.splice(0, 1)
+    const localizations = values.map(value => mapLocalizationFromValues(keys, value))
+
+    if (resultId) {
+        await GoogleLocalization.updateOne({_id: resultId}, {localization: localizations})
+    } else {
+        await GoogleLocalization.create({localization: localizations})
+    }
+    return res.status(200).send(localizations)
 }
 
 function mapLocalizationFromValues(keys, values) {

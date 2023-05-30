@@ -5,11 +5,22 @@ const User = require('../models/user')
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const log = require('../middleware/log')
+const sendPushNotifications = require("../firebase/fcm");
+const Extensions = require("../utils/extensions");
 
 const router = express.Router()
 
+let cronList = []
+
+class CronItem {
+    constructor(cronJob, tripId) {
+        this.cronJob = cronJob
+        this.tripId = tripId
+    }
+}
+
 //create trip
-router.post('/', log, auth, async (req, res) => {
+router.post('/', log, async (req, res) => {
     try {
         const {driverId, startPoint, endPoint, date} = req.body
 
@@ -45,9 +56,14 @@ router.post('/', log, auth, async (req, res) => {
             const hour = date.hour
             const day = date.day
             const month = date.month
-            cron.schedule(`${second} ${minute} ${hour} ${day} ${month} *`, () => {
-                console.log(`Send push to ${driverId}`)
-            })
+            const cronJob = cron.schedule(`${second} ${minute} ${hour} ${day} ${month} *`, async () => {
+                await sendPushNotifications(driverId, {
+                    key: "START_TRIP_REMINDER",
+                    tripId: trip._id.toString()
+                })
+            }, {timezone: "Etc/GMT"})
+
+            cronList.push(new CronItem(cronJob, trip._id))
         }
 
         const tripResponse = trip.toObject()
@@ -61,6 +77,23 @@ router.post('/', log, auth, async (req, res) => {
     }
 })
 
+router.get('/:id', log, auth, async (req, res) => {
+    const trip = await Trip.findOne({_id: req.params.id})
+    if (!trip) {
+        return res.status(400).send(Error.noSuchTrip)
+    }
+    const responseTrip = await Extensions.getResponseTripById(trip._id)
+    res.status(200).send(responseTrip)
+})
+
+router.post('/:id/start', log, auth, async (req, res) => {
+    const trip = await Trip.findOneAndUpdate({_id: req.params.id}, {status: 'ACTIVE'})
+    if (!trip) {
+        return res.status(400).send(Error.noSuchTrip)
+    }
+    res.status(200).send()
+})
+
 router.post('/:id/complete', log, auth, async (req, res) => {
     const trip = await Trip.findOneAndUpdate({_id: req.params.id}, {status: 'COMPLETED'})
     if (!trip) {
@@ -70,10 +103,17 @@ router.post('/:id/complete', log, auth, async (req, res) => {
 })
 
 router.post('/:id/cancel', log, auth, async (req, res) => {
-    const trip = await Trip.findOneAndUpdate({_id: req.params.id}, {status: 'CANCELLED'})
+    const tripId = req.params.id
+    const trip = await Trip.findOneAndUpdate({_id: tripId}, {status: 'CANCELLED'})
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)
     }
+    const job = cronList.find(cronItem => cronItem.tripId === tripId)
+    if (job) {
+        job.cancel()
+        cronList = cronList.filter(cronItem => cronItem !== job)
+    }
+
     res.status(200).send()
 })
 
