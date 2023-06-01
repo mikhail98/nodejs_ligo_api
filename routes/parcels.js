@@ -16,7 +16,7 @@ const router = express.Router()
 
 router.post('/', log, auth, async (req, res) => {
     try {
-        const {userId, startPoint, endPoint, size, weight} = req.body
+        const {userId, startPoint, endPoint, types, weight} = req.body
 
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
@@ -32,9 +32,8 @@ router.post('/', log, auth, async (req, res) => {
             userId: userId,
             startPoint: startPoint,
             endPoint: endPoint,
-            size: size,
             status: 'CREATED',
-            types: ['BIG_BOX'],
+            types: types,
             price: {
                 value: 228,
                 currency: "USD"

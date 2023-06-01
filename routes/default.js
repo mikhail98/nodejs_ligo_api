@@ -1,6 +1,6 @@
 const express = require('express')
 const log = require('../middleware/log')
-const Config = require("../utils/config");
+const Config = require("../utils/config")
 
 const router = express.Router()
 

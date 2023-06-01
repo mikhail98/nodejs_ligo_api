@@ -20,7 +20,7 @@ const parcelSchema = new mongoose.Schema({
     },
     types: [{
         type: String,
-        enum: ['SMALL_BOX', 'BOX', 'BIG_BOX', 'DOCUMENTS', 'LARGE_ITEM'],
+        enum: ['SMALL', 'MEDIUM', 'LARGE', 'DOCUMENTS', 'OVERSIZE'],
         unique: false,
         required: true
     }],

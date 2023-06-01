@@ -87,9 +87,15 @@ router.get('/:id', log, auth, async (req, res) => {
 })
 
 router.post('/:id/start', log, auth, async (req, res) => {
-    const trip = await Trip.findOneAndUpdate({_id: req.params.id}, {status: 'ACTIVE'})
+    const tripId = req.params.id
+    const trip = await Trip.findOneAndUpdate({_id: tripId}, {status: 'ACTIVE'})
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)
+    }
+    const job = cronList.find(cronItem => cronItem.tripId === tripId)
+    if (job) {
+        job.cancel()
+        cronList = cronList.filter(cronItem => cronItem !== job)
     }
     res.status(200).send()
 })

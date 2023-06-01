@@ -110,7 +110,7 @@ function findAndSaveDirection(origin, destination, res, resultId) {
         })
 }
 
-router.get('/localization', log, auth, async (req, res) => {
+router.get('/localization', log, async (req, res) => {
     await updateLocalisation(res, LOCALIZATION_UPDATE_INTERVAL_DAYS)
 })
 
