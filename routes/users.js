@@ -36,7 +36,8 @@ router.post('/', log, async (req, res) => {
             fcmTokens: [fcmToken],
             passportPhotoUrl: passportPhotoUrl,
             avatarUrl: avatarUrl,
-            isAdmin: false
+            isAdmin: false,
+            isDeleted: false
         })
         user.token = jwt.sign(
             {email_id: email.toLowerCase()}, "LigoTokenKey", {}

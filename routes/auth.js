@@ -40,7 +40,27 @@ router.post('/:id/logout', log, auth, async (req, res) => {
 })
 
 router.post('/:id/delete', log, auth, async (req, res) => {
-    const user = await User.findByIdAndDelete({_id: req.params.id})
+    const userId = req.params.id
+    const user = await User.findByIdAndUpdate(
+        {
+            _id: userId
+        }, {
+            name: userId,
+            email: userId,
+            password: userId,
+            phone: null,
+            isDriver: false,
+            location: null,
+            fcmTokens: [],
+            isValidated: false,
+            passportPhotoUrl: null,
+            avatarUrl: null,
+            isAdmin: false,
+            ratings: [],
+            token: null,
+            isDeleted: true
+        }
+    )
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
