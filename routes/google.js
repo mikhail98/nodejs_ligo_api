@@ -15,7 +15,7 @@ const sheetsKey = process.env.GOOGLE_SHEETS_API_KEY || properties.GOOGLE_SHEETS_
 
 const PLACES_UPDATE_INTERVAL_DAYS = 14
 const DIRECTIONS_UPDATE_INTERVAL_DAYS = 14
-const LOCALIZATION_UPDATE_INTERVAL_DAYS = 1
+const LOCALIZATION_UPDATE_INTERVAL_DAYS = 30
 
 router.get('/places', log, auth, async (req, res) => {
     const text = req.query.query
