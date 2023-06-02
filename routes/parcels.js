@@ -38,6 +38,7 @@ router.post('/', log, auth, async (req, res) => {
             weight: weight
         })
 
+        await Extensions.requestDriverForParcel(createdParcel._id)
         const responseParcel = await Extensions.getResponseParcelById(createdParcel._id)
         user.password = null
         user.fcmTokens = []
