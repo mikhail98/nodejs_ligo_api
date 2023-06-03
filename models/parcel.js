@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const pointSchema = require("../models/point")
+const priceSchema = require("../models/price")
 
 const parcelSchema = new mongoose.Schema({
     userId: {
@@ -17,12 +18,12 @@ const parcelSchema = new mongoose.Schema({
         unique: false,
         required: true,
     },
-    size: {
+    types: [{
         type: String,
-        enum: ['XS', 'S', 'M', 'L', 'XL'],
+        enum: ['SMALL', 'MEDIUM', 'LARGE', 'DOCUMENTS', 'OVERSIZE'],
         unique: false,
         required: true
-    },
+    }],
     notifiedDrivers: [{
         type: String,
         unique: false,
@@ -38,11 +39,19 @@ const parcelSchema = new mongoose.Schema({
         enum: ['CREATED', 'ACCEPTED', 'PICKED', 'DELIVERED', 'CANCELLED'],
         unique: false,
         required: true
+    },
+    price: {
+        type: priceSchema,
+        unique: false,
+        required: true,
+    },
+    weight: {
+        type: Number,
+        unique: false,
+        required: false,
     }
 }, {timestamps: true})
 
 const Parcel = mongoose.model('Parcel', parcelSchema)
 
-module.exports = {
-    Parcel, parcelSchema
-}
+module.exports = Parcel

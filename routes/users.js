@@ -3,13 +3,13 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Trip = require('../models/trip')
+const Parcel = require("../models/parcel")
 const Rating = require('../models/rating').Rating
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const log = require('../middleware/log')
 const socket = require('../socket/socket')
 const sendPushNotifications = require("../firebase/fcm")
-const {Parcel} = require("../models/parcel")
 const Extensions = require('../utils/extensions')
 
 const router = express.Router()
@@ -32,11 +32,12 @@ router.post('/', log, async (req, res) => {
             password: encryptedPassword,
             phone: phone,
             isDriver: isDriver,
-            isValidated: !isDriver,
+            isValidated: true,
             fcmTokens: [fcmToken],
             passportPhotoUrl: passportPhotoUrl,
             avatarUrl: avatarUrl,
-            isAdmin: false
+            isAdmin: false,
+            isDeleted: false
         })
         user.token = jwt.sign(
             {email_id: email.toLowerCase()}, "LigoTokenKey", {}
@@ -85,6 +86,13 @@ router.get('/:id', log, auth, async (req, res) => {
     res.status(200).send(user)
 })
 
+router.post('/exists', log, async (req, res) => {
+    const {email} = req.body
+    const user = await User.findOne({email})
+
+    return res.status(200).send({userExists: user !== null})
+})
+
 //update user location
 router.patch('/:id/location', log, auth, async (req, res) => {
     const _id = req.params.id
@@ -95,7 +103,7 @@ router.patch('/:id/location', log, auth, async (req, res) => {
         return res.status(400).send(Error.noSuchUser)
     }
     if (user.isDriver) {
-        const trip = await Trip.findOne({driverId: _id, status: 'ACTIVE'})
+        const trip = await Trip.findOne({driverId: _id, status: {$in: ['ACTIVE', 'SCHEDULED']}})
         if (trip) {
             const responseTrip = await Extensions.getResponseTripById(trip._id)
             responseTrip.parcels

@@ -15,8 +15,18 @@ const googleDirectionSchema = new mongoose.Schema({
         type: String,
         unique: false,
         required: true,
+    },
+    startAddress: {
+        type: String,
+        unique: false,
+        required: false,
+    },
+    endAddress: {
+        type: String,
+        unique: false,
+        required: false,
     }
-})
+}, {timestamps: true})
 
 const GoogleDirection = mongoose.model('GoogleDirection', googleDirectionSchema)
 

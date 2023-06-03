@@ -68,6 +68,11 @@ const userSchema = new mongoose.Schema({
         unique: false,
         required: false,
     },
+    isDeleted: {
+        type: Boolean,
+        unique: false,
+        required: false,
+    }
 })
 
 const User = mongoose.model('User', userSchema)
