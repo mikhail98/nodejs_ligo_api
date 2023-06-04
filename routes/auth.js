@@ -5,6 +5,27 @@ const Error = require('../errors/errors')
 const jwt = require("jsonwebtoken")
 const auth = require("../middleware/auth")
 const log = require('../middleware/log')
+const {OAuth2Client} = require('google-auth-library')
+const Properties = require('../local/properties')
+
+const GOOGLE_AUTH_CLIENT_ID = process.env.GOOGLE_AUTH_CLIENT_ID || Properties.GOOGLE_AUTH_CLIENT_ID
+const client = new OAuth2Client(GOOGLE_AUTH_CLIENT_ID)
+
+async function verify(user, token) {
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: GOOGLE_AUTH_CLIENT_ID
+        });
+        const payload = ticket.getPayload();
+        const email = payload['email'];
+        console.log(email)
+        return email === user.email
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
 
 const router = express.Router()
 
@@ -15,17 +36,18 @@ router.post('/login', log, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-
-    if (await bcrypt.compare(password, user.password)) {
-        user.token = jwt.sign(
-            {email_id: user.email}, "LigoTokenKey", {}
-        )
-        user.password = null
-        user.fcmTokens = []
-        res.status(200).send(user)
-    } else {
-        res.status(400).send(Error.wrongPassword)
+    const isValidToken = await verify(user, password)
+    if (!isValidToken) {
+        return res.status(400).send(Error.wrongPassword)
     }
+    // if (await bcrypt.compare(password, user.password)) {
+
+    user.token = jwt.sign(
+        {email_id: user.email}, "LigoTokenKey", {}
+    )
+    user.password = null
+    user.fcmTokens = []
+    res.status(200).send(user)
 })
 
 router.post('/:id/logout', log, auth, async (req, res) => {
