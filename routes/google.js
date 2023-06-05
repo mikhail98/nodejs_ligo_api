@@ -2,6 +2,7 @@ const express = require('express')
 const auth = require("../middleware/auth")
 const log = require('../middleware/log')
 const axios = require('axios')
+const Error = require('../errors/errors')
 const properties = require("../local/properties")
 const GooglePlace = require('../models/google_place')
 const GoogleDirection = require('../models/google_direction')
@@ -69,7 +70,11 @@ router.get('/directions', log, auth, async (req, res) => {
         if (timeDifference / 86_400_000 >= DIRECTIONS_UPDATE_INTERVAL_DAYS) {
             findAndSaveDirection(origin, destination, res, result._id)
         } else {
-            res.status(200).send(result.response)
+            if (result.response) {
+                res.status(200).send(result.response)
+            } else {
+                res.status(400).send(Error.cantFindRoute)
+            }
         }
     } else {
         findAndSaveDirection(origin, destination, res)
@@ -106,7 +111,16 @@ function findAndSaveDirection(origin, destination, res, resultId) {
             return res.status(200).send(dataString)
         })
         .catch(error => {
-            return res.status(400).send(error)
+            if (!resultId) {
+                GoogleDirection.create({
+                    origin: origin,
+                    destination: destination,
+                    response: null,
+                    startAddress: null,
+                    endAddress: null,
+                })
+            }
+            return res.status(400).send(Error.cantFindRoute)
         })
 }
 

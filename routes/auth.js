@@ -30,17 +30,25 @@ async function verify(user, token) {
 const router = express.Router()
 
 router.post('/login', log, async (req, res) => {
-    const {email, password} = req.body
+    const {email, password, token} = req.body
     const user = await User.findOne({email})
 
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-    const isValidToken = await verify(user, password)
-    if (!isValidToken) {
-        return res.status(400).send(Error.wrongPassword)
+    if (token !== null) {
+        const isValidToken = await verify(user, token)
+        if (!isValidToken) {
+            return res.status(400).send(Error.wrongPassword)
+        }
+    } else if (password !== null) {
+        const isValidPassword = await bcrypt.compare(password, user.password)
+        if (!isValidPassword) {
+            return res.status(400).send(Error.wrongPassword)
+        }
+    } else {
+        return res.status(400).send(Error.provideTokenOrPassword)
     }
-    // if (await bcrypt.compare(password, user.password)) {
 
     user.token = jwt.sign(
         {email_id: user.email}, "LigoTokenKey", {}

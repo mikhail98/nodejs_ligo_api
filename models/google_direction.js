@@ -14,7 +14,7 @@ const googleDirectionSchema = new mongoose.Schema({
     response: {
         type: String,
         unique: false,
-        required: true,
+        required: false,
     },
     startAddress: {
         type: String,
