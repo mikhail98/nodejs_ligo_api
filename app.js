@@ -15,7 +15,7 @@ const port = process.env.PORT || 80
 
 const socket = require('./socket/socket')
 
-const serverVersion = "1.5-develop"
+const serverVersion = "1.5"
 
 const mongoUrl = process.env.MONGODB_URL || properties.MONGODB_URL
 
