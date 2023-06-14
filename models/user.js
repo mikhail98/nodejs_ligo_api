@@ -23,10 +23,11 @@ const userSchema = new mongoose.Schema({
         unique: false,
         required: false,
     },
-    isDriver: {
-        type: Boolean,
+    role: {
+        type: String,
+        enum: ['SENDER', 'DRIVER'],
         unique: false,
-        required: true,
+        required: true
     },
     location: {
         type: pointSchema,

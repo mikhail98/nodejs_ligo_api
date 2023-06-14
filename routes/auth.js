@@ -79,7 +79,6 @@ router.post('/:id/delete', log, auth, async (req, res) => {
             email: userId,
             password: userId,
             phone: null,
-            isDriver: false,
             location: null,
             fcmTokens: [],
             isValidated: false,
