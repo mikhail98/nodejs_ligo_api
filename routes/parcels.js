@@ -177,6 +177,36 @@ router.post('/:id/cancel', log, auth, async (req, res) => {
     res.status(200).send(parcel)
 })
 
+router.post('/:id/reject', log, auth, async (req, res) => {
+    const parcelId = req.params.id
+    const {rejectReason, rejectComment, rejectPhotoUrl} = req.body
+
+    const trips = await Trip.find()
+    const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcelId))
+
+    const parcel = await Parcel.findOne({_id: parcelId})
+
+    if (parcel === null) {
+        return res.status(400).send(Errors.noSuchParcel)
+    }
+
+    parcel.status = 'REJECTED'
+    parcel.rejectReason = rejectReason
+    parcel.rejectComment = rejectComment
+    parcel.rejectPhotoUrl = rejectPhotoUrl
+    Socket.emitEvent(parcel.userId, "parcelRejected", parcel)
+
+    await sendPushNotifications(parcel.userId, {
+        key: "PARCEL_REJECTED",
+        parcelId: parcelId.toString()
+    })
+
+    trip.parcels = trip.parcels.filter(id => id !== parcelId)
+    await Parcel.updateOne({_id: parcelId}, parcel)
+    await Trip.updateOne({_id: trip._id}, trip)
+    res.status(200).send(parcel)
+})
+
 router.post('/:id/deliver', log, auth, async (req, res) => {
     const parcelId = req.params.id
     const {secret} = req.body

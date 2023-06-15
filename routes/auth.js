@@ -1,6 +1,7 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const DeletedUser = require('../models/deleted_user')
 const Error = require('../errors/errors')
 const jwt = require("jsonwebtoken")
 const auth = require("../middleware/auth")
@@ -71,7 +72,12 @@ router.post('/:id/logout', log, auth, async (req, res) => {
 
 router.post('/:id/delete', log, auth, async (req, res) => {
     const userId = req.params.id
-    const user = await User.findByIdAndUpdate(
+    const userToDelete = await User.findById(userId)
+    if (!userToDelete) {
+        return res.status(400).send(Error.noSuchUser)
+    }
+    const email = userToDelete.email
+    await User.findByIdAndUpdate(
         {
             _id: userId
         }, {
@@ -79,7 +85,6 @@ router.post('/:id/delete', log, auth, async (req, res) => {
             email: userId,
             password: userId,
             phone: null,
-            isDriver: false,
             location: null,
             fcmTokens: [],
             isValidated: false,
@@ -91,9 +96,7 @@ router.post('/:id/delete', log, auth, async (req, res) => {
             isDeleted: true
         }
     )
-    if (!user) {
-        return res.status(400).send(Error.noSuchUser)
-    }
+    await DeletedUser.create({userId, email})
     res.status(200).send()
 })
 

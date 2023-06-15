@@ -17,7 +17,7 @@ const router = express.Router()
 //create user
 router.post('/', log, async (req, res) => {
     try {
-        const {name, email, password, phone, isDriver, fcmToken, passportPhotoUrl, avatarUrl} = req.body
+        const {name, email, password, phone, role, fcmToken, passportPhotoUrl, avatarUrl} = req.body
 
         const oldUser = await User.findOne({email})
 
@@ -31,7 +31,7 @@ router.post('/', log, async (req, res) => {
             email: email.toLowerCase(),
             password: encryptedPassword,
             phone: phone,
-            isDriver: isDriver,
+            role: role,
             isValidated: true,
             fcmTokens: [fcmToken],
             passportPhotoUrl: passportPhotoUrl,
@@ -58,20 +58,6 @@ router.get('/', log, auth, async (req, res) => {
         user.fcmTokens = []
     })
     res.status(200).send(users)
-})
-
-//get all drivers
-router.get('/drivers', log, async (req, res) => {
-    try {
-        const drivers = await User.find({isDriver: true})
-        drivers.forEach(driver => {
-            driver.password = null
-            driver.fcmTokens = []
-        })
-        res.status(200).send(drivers)
-    } catch (error) {
-        res.status(500).send(error)
-    }
 })
 
 //get user by id
@@ -102,24 +88,22 @@ router.patch('/:id/location', log, auth, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-    if (user.isDriver) {
-        const trip = await Trip.findOne({driverId: _id, status: {$in: ['ACTIVE', 'SCHEDULED']}})
-        if (trip) {
-            const responseTrip = await Extensions.getResponseTripById(trip._id)
-            responseTrip.parcels
-                .filter(parcel => parcel.status === 'ACCEPTED' || parcel.status === 'PICKED')
-                .map(parcel => parcel.userId)
-                .forEach(userId => socket.emitEvent(userId, "driverLocationUpdated", location))
+    const trip = await Trip.findOne({driverId: _id, status: {$in: ['ACTIVE', 'SCHEDULED']}})
+    if (trip) {
+        const responseTrip = await Extensions.getResponseTripById(trip._id)
+        responseTrip.parcels
+            .filter(parcel => parcel.status === 'ACCEPTED' || parcel.status === 'PICKED')
+            .map(parcel => parcel.userId)
+            .forEach(userId => socket.emitEvent(userId, "driverLocationUpdated", location))
 
-            const parcels = await Parcel.find({status: 'CREATED'})
-            const parcelIds = parcels.map(parcel => parcel._id.toString())
+        const parcels = await Parcel.find({status: 'CREATED'})
+        const parcelIds = parcels.map(parcel => parcel._id.toString())
 
-            Promise.allSettled(parcelIds.map(parcelId => Extensions.requestDriverForParcel(parcelId)))
-                .then(() => {
-                })
-                .catch(() => {
-                })
-        }
+        Promise.allSettled(parcelIds.map(parcelId => Extensions.requestDriverForParcel(parcelId)))
+            .then(() => {
+            })
+            .catch(() => {
+            })
     }
     res.status(200).send()
 })
@@ -204,9 +188,6 @@ router.patch('/:id/validate', log, auth, async (req, res) => {
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
-    if (!user.isDriver) {
-        return res.status(400).send(Error.notADriver)
-    }
 
     let {isValidated} = req.body
     await User.findOneAndUpdate({_id: req.params.id}, {isValidated})
@@ -232,7 +213,7 @@ router.get('/:id/senderTrips', log, auth, async (req, res) => {
     const trips = await Trip.find()
     const responseTrips = await Promise.all(
         parcels.map(async (parcel) => {
-            if (parcel.status === "CREATED" || parcel.status === "CANCELLED") {
+            if (parcel.status === "CREATED" || parcel.status === "CANCELLED" || parcel.status === "REJECTED") {
                 const parcelWithUser = await Extensions.getResponseParcelById(parcel._id)
                 return {
                     parcels: [parcelWithUser],

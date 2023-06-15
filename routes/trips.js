@@ -32,10 +32,6 @@ router.post('/', log, async (req, res) => {
             return res.status(400).send(Error.noSuchUser)
         }
 
-        if (!user.isDriver) {
-            return res.status(400).send(Error.notADriver)
-        }
-
         const activeTrip = await Trip.findOne({driverId, status: {$in: ['ACTIVE', 'SCHEDULED']}})
         if (activeTrip !== null) {
             return res.status(400).send(Error.driverHasActiveTrip)

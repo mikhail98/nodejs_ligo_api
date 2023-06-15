@@ -36,7 +36,7 @@ const parcelSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        enum: ['CREATED', 'ACCEPTED', 'PICKED', 'DELIVERED', 'CANCELLED'],
+        enum: ['CREATED', 'ACCEPTED', 'PICKED', 'DELIVERED', 'REJECTED', 'CANCELLED'],
         unique: false,
         required: true
     },
@@ -44,6 +44,22 @@ const parcelSchema = new mongoose.Schema({
         type: priceSchema,
         unique: false,
         required: true,
+    },
+    rejectReason: {
+        type: String,
+        enum: ['PARCEL_TOO_BIG', 'CANT_FIND_SENDER', 'PARCEL_ILLEGAL', 'OTHER'],
+        unique: false,
+        required: false,
+    },
+    rejectComment: {
+        type: String,
+        unique: false,
+        required: false,
+    },
+    rejectPhotoUrl: {
+        type: String,
+        unique: false,
+        required: false,
     },
     weight: {
         type: Number,
