@@ -190,10 +190,6 @@ router.post('/:id/reject', log, auth, async (req, res) => {
         return res.status(400).send(Errors.noSuchParcel)
     }
 
-    if (trip) {
-        return res.status(400).send(Errors.parcelInActiveTrip)
-    }
-
     parcel.status = 'REJECTED'
     parcel.rejectReason = rejectReason
     parcel.rejectComment = rejectComment
