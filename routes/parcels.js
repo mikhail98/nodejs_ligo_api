@@ -195,6 +195,12 @@ router.post('/:id/reject', log, auth, async (req, res) => {
     parcel.rejectComment = rejectComment
     parcel.rejectPhotoUrl = rejectPhotoUrl
     Socket.emitEvent(parcel.userId, "parcelRejected", parcel)
+
+    await sendPushNotifications(parcel.userId, {
+        key: "PARCEL_REJECTED",
+        parcelId: parcelId.toString()
+    })
+
     trip.parcels = trip.parcels.filter(id => id !== parcelId)
     await Parcel.updateOne({_id: parcelId}, parcel)
     await Trip.updateOne({_id: trip._id}, trip)
