@@ -179,7 +179,7 @@ router.post('/:id/cancel', log, auth, async (req, res) => {
 
 router.post('/:id/reject', log, auth, async (req, res) => {
     const parcelId = req.params.id
-    const {rejectReason, rejectComment, rejectPickupPhotoUrl} = req.body
+    const {rejectReason, rejectComment, rejectPhotoUrl} = req.body
 
     const trips = await Trip.find()
     const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcelId))
@@ -193,7 +193,7 @@ router.post('/:id/reject', log, auth, async (req, res) => {
     parcel.status = 'REJECTED'
     parcel.rejectReason = rejectReason
     parcel.rejectComment = rejectComment
-    parcel.rejectPickupPhotoUrl = rejectPickupPhotoUrl
+    parcel.rejectPhotoUrl = rejectPhotoUrl
     Socket.emitEvent(parcel.userId, "parcelRejected", parcel)
     trip.parcels = trip.parcels.filter(id => id !== parcelId)
     await Parcel.updateOne({_id: parcelId}, parcel)

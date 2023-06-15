@@ -56,7 +56,7 @@ const parcelSchema = new mongoose.Schema({
         unique: false,
         required: false,
     },
-    rejectPickupPhotoUrl: {
+    rejectPhotoUrl: {
         type: String,
         unique: false,
         required: false,

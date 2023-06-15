@@ -213,7 +213,7 @@ router.get('/:id/senderTrips', log, auth, async (req, res) => {
     const trips = await Trip.find()
     const responseTrips = await Promise.all(
         parcels.map(async (parcel) => {
-            if (parcel.status === "CREATED" || parcel.status === "CANCELLED") {
+            if (parcel.status === "CREATED" || parcel.status === "CANCELLED" || parcel.status === "REJECTED") {
                 const parcelWithUser = await Extensions.getResponseParcelById(parcel._id)
                 return {
                     parcels: [parcelWithUser],
