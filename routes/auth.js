@@ -1,52 +1,26 @@
 const express = require('express')
-const bcrypt = require('bcrypt')
 const User = require('../models/user')
 const DeletedUser = require('../models/deleted_user')
 const Error = require('../errors/errors')
 const jwt = require("jsonwebtoken")
 const auth = require("../middleware/auth")
 const log = require('../middleware/log')
-const {OAuth2Client} = require('google-auth-library')
-const Properties = require('../local/properties')
-
-const GOOGLE_AUTH_CLIENT_ID = process.env.GOOGLE_AUTH_CLIENT_ID || Properties.GOOGLE_AUTH_CLIENT_ID
-const client = new OAuth2Client(GOOGLE_AUTH_CLIENT_ID)
-
-async function verify(user, token) {
-    try {
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: GOOGLE_AUTH_CLIENT_ID
-        });
-        const payload = ticket.getPayload();
-        const email = payload['email'];
-        console.log(email)
-        return email === user.email
-    } catch (error) {
-        console.log(error)
-        return false
-    }
-}
+const {verifyGoogleToken} = require('../utils/extensions')
 
 const router = express.Router()
 
 router.post('/login', log, async (req, res) => {
     // #swagger.tags = ['Auth']
 
-    const {email, password, token} = req.body
+    const {email, token} = req.body
     const user = await User.findOne({email})
 
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
     }
     if (token !== null) {
-        const isValidToken = await verify(user, token)
+        const isValidToken = await verifyGoogleToken(user.email, token)
         if (!isValidToken) {
-            return res.status(400).send(Error.wrongPassword)
-        }
-    } else if (password !== null) {
-        const isValidPassword = await bcrypt.compare(password, user.password)
-        if (!isValidPassword) {
             return res.status(400).send(Error.wrongPassword)
         }
     } else {

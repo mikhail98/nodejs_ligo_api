@@ -1,5 +1,4 @@
 const express = require('express')
-const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 const Trip = require('../models/trip')
@@ -11,6 +10,7 @@ const log = require('../middleware/log')
 const socket = require('../socket/socket')
 const sendPushNotifications = require("../firebase/fcm")
 const Extensions = require('../utils/extensions')
+const {verifyGoogleToken} = require("../utils/extensions");
 
 const router = express.Router()
 
@@ -18,7 +18,7 @@ const router = express.Router()
 router.post('/', log, async (req, res) => {
     // #swagger.tags = ['Users']
     try {
-        const {name, email, password, phone, role, fcmToken, passportPhotoUrl, avatarUrl} = req.body
+        const {name, email, token, phone, role, fcmToken, passportPhotoUrl, avatarUrl} = req.body
 
         const oldUser = await User.findOne({email})
 
@@ -26,11 +26,14 @@ router.post('/', log, async (req, res) => {
             return res.status(400).send(Error.userExits)
         }
 
-        const encryptedPassword = await bcrypt.hash(password, 10)
+        const isValidToken = await verifyGoogleToken(email, token)
+        if (!isValidToken) {
+            return res.status(400).send(Error.cannotCreateUser)
+        }
+
         const user = await User.create({
             name: name,
             email: email.toLowerCase(),
-            password: encryptedPassword,
             phone: phone,
             role: role,
             isValidated: true,
@@ -47,6 +50,7 @@ router.post('/', log, async (req, res) => {
         user.fcmTokens = []
         res.status(200).send(user)
     } catch (error) {
+        console.log("error")
         res.status(400).send(error)
     }
 })

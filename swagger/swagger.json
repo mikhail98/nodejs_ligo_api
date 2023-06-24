@@ -1,14 +1,14 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.0.0",
+    "version": "1.6",
     "title": "REST API",
     "description": ""
   },
-  "host": "localhost:3000",
+  "host": "pingo-demo.herokuapp.com",
   "basePath": "/",
   "schemes": [
-    "http"
+    "https"
   ],
   "paths": {
     "/login": {
@@ -25,13 +25,10 @@
               "type": "object",
               "properties": {
                 "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
+                  "example": "testemail@gmail.com"
                 },
                 "token": {
-                  "example": "any"
+                  "example": "Google.idToken"
                 }
               }
             }
@@ -39,7 +36,40 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "ObjectId"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Mikhail Yarashevich"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "bigbottleapps@gmail.com"
+                },
+                "role": {
+                  "type": "string",
+                  "example": "DRIVER"
+                },
+                "avatarUrl": {
+                  "type": "string",
+                  "example": "https://firebasestorageurl.com"
+                },
+                "phone": {
+                  "type": "string",
+                  "example": "+48518763123"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "jwtToken"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -72,7 +102,8 @@
               "type": "object",
               "properties": {
                 "fcmToken": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "fcmToken"
                 }
               }
             }
@@ -148,7 +179,7 @@
                 "email": {
                   "example": "any"
                 },
-                "password": {
+                "token": {
                   "example": "any"
                 },
                 "phone": {

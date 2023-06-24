@@ -3,6 +3,7 @@ const noSuchTrip = createError(102, "No such trip")
 const noSuchParcel = createError(103, "No such parcel")
 const noSecretForThisParcel = createError(104, "No secret for this parcel")
 const cantFindRoute = createError(105, "Can't find route")
+const cannotCreateUser = createError(106, "Cannot create user")
 
 const userExits = createError(201, "This user also exists")
 const notADriver = createError(202, "Not a driver")
@@ -45,5 +46,6 @@ module.exports = {
     parcelInActiveTrip,
     ratingExists,
     provideTokenOrPassword,
-    cantFindRoute
+    cantFindRoute,
+    cannotCreateUser
 }
