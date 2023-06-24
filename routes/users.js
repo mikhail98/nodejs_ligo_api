@@ -16,6 +16,7 @@ const router = express.Router()
 
 //create user
 router.post('/', log, async (req, res) => {
+    // #swagger.tags = ['Users']
     try {
         const {name, email, password, phone, role, fcmToken, passportPhotoUrl, avatarUrl} = req.body
 
@@ -50,18 +51,9 @@ router.post('/', log, async (req, res) => {
     }
 })
 
-//get all users
-router.get('/', log, auth, async (req, res) => {
-    const users = await User.find()
-    users.forEach(user => {
-        user.password = null
-        user.fcmTokens = []
-    })
-    res.status(200).send(users)
-})
-
 //get user by id
 router.get('/:id', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const user = await User.findOne({_id: req.params.id})
 
     if (!user) {
@@ -73,6 +65,7 @@ router.get('/:id', log, auth, async (req, res) => {
 })
 
 router.post('/exists', log, async (req, res) => {
+    // #swagger.tags = ['Users']
     const {email} = req.body
     const user = await User.findOne({email})
 
@@ -81,6 +74,7 @@ router.post('/exists', log, async (req, res) => {
 
 //update user location
 router.patch('/:id/location', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const _id = req.params.id
     const {location} = req.body
     const user = await User.findOneAndUpdate({_id}, {location: location})
@@ -110,6 +104,7 @@ router.patch('/:id/location', log, auth, async (req, res) => {
 
 //update user fcm token
 router.patch('/:id/fcmToken', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const _id = req.params.id
     const user = await User.findOne({_id})
     const {fcmToken} = req.body
@@ -124,6 +119,7 @@ router.patch('/:id/fcmToken', log, auth, async (req, res) => {
 
 //update user passportPhoto
 router.patch('/:id/passportPhoto', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const _id = req.params.id
     const {passportPhotoUrl} = req.body
     const user = await User.findOneAndUpdate({_id}, {passportPhotoUrl})
@@ -136,6 +132,7 @@ router.patch('/:id/passportPhoto', log, auth, async (req, res) => {
 
 //update user avatar
 router.patch('/:id/avatar', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const _id = req.params.id
     const {avatarUrl} = req.body
     const user = await User.findOneAndUpdate({_id}, {avatarUrl})
@@ -148,6 +145,7 @@ router.patch('/:id/avatar', log, auth, async (req, res) => {
 
 //feedback user
 router.patch('/:id/rating', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const validatorEmail = req.user.email_id
     const validator = await User.findOne({email: validatorEmail})
     const userFromId = validator._id
@@ -178,6 +176,7 @@ router.patch('/:id/rating', log, auth, async (req, res) => {
 
 //validate user
 router.patch('/:id/validate', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const validatorEmail = req.user.email_id
     const validator = await User.findOne({email: validatorEmail})
     if (!validator.isAdmin) {
@@ -203,11 +202,13 @@ router.patch('/:id/validate', log, auth, async (req, res) => {
 })
 
 router.get('/:id/driverTrips', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const trips = await Trip.find({driverId: req.params.id})
     res.status(200).send(await Extensions.getResponseTripsById(trips.map(trip => trip._id)))
 })
 
 router.get('/:id/senderTrips', log, auth, async (req, res) => {
+    // #swagger.tags = ['Users']
     const parcels = await Parcel.find({userId: req.params.id})
 
     const trips = await Trip.find()

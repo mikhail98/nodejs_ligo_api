@@ -31,6 +31,8 @@ async function verify(user, token) {
 const router = express.Router()
 
 router.post('/login', log, async (req, res) => {
+    // #swagger.tags = ['Auth']
+
     const {email, password, token} = req.body
     const user = await User.findOne({email})
 
@@ -60,6 +62,7 @@ router.post('/login', log, async (req, res) => {
 })
 
 router.post('/:id/logout', log, auth, async (req, res) => {
+    // #swagger.tags = ['Auth']
     const user = await User.findOneAndUpdate({_id: req.params.id}, {fcmToken: null})
     if (!user) {
         return res.status(400).send(Error.noSuchUser)
@@ -71,6 +74,7 @@ router.post('/:id/logout', log, auth, async (req, res) => {
 })
 
 router.post('/:id/delete', log, auth, async (req, res) => {
+    // #swagger.tags = ['Auth']
     const userId = req.params.id
     const userToDelete = await User.findById(userId)
     if (!userToDelete) {

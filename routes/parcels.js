@@ -15,6 +15,7 @@ const sendPushNotifications = require("../firebase/fcm")
 const router = express.Router()
 
 router.post('/', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     try {
         const {userId, startPoint, endPoint, types, weight, price} = req.body
 
@@ -50,6 +51,7 @@ router.post('/', log, auth, async (req, res) => {
 })
 
 router.get('/:id', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const parcel = await Parcel.findOne({_id: req.params.id})
 
     if (parcel === null) {
@@ -69,6 +71,7 @@ router.get('/:id', log, auth, async (req, res) => {
 })
 
 router.post('/:id/accept', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const driver = await User.findOne({email: req.user.email_id})
     const parcelId = req.params.id
     const driverId = driver._id
@@ -113,6 +116,7 @@ router.post('/:id/accept', log, auth, async (req, res) => {
 })
 
 router.post('/:id/decline', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const driver = await User.findOne({email: req.user.email_id})
     const parcelId = req.params.id
     const driverId = driver._id
@@ -126,6 +130,7 @@ router.post('/:id/decline', log, auth, async (req, res) => {
 })
 
 router.post('/:id/pickup', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const driver = await User.findOne({email: req.user.email_id})
     const parcelId = req.params.id
     const {tripId} = req.body
@@ -154,6 +159,7 @@ router.post('/:id/pickup', log, auth, async (req, res) => {
 })
 
 router.post('/:id/cancel', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const parcelId = req.params.id
 
     const trips = await Trip.find()
@@ -178,6 +184,7 @@ router.post('/:id/cancel', log, auth, async (req, res) => {
 })
 
 router.post('/:id/reject', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const parcelId = req.params.id
     const {rejectReason, rejectComment, rejectPhotoUrl} = req.body
 
@@ -208,6 +215,7 @@ router.post('/:id/reject', log, auth, async (req, res) => {
 })
 
 router.post('/:id/deliver', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const parcelId = req.params.id
     const {secret} = req.body
 
@@ -239,6 +247,7 @@ router.post('/:id/deliver', log, auth, async (req, res) => {
 })
 
 router.post('/:id/secret', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const user = await User.findOne({email: req.user.email_id})
 
     const parcelId = req.params.id
@@ -257,6 +266,7 @@ router.post('/:id/secret', log, auth, async (req, res) => {
 })
 
 router.get('/:id/secret', log, auth, async (req, res) => {
+    // #swagger.tags = ['Parcels']
     const secret = await Secret.findOne({parcelId: req.params.id})
 
     if (secret === null) {

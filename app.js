@@ -13,6 +13,9 @@ const properties = require('./local/properties')
 const app = express()
 const port = process.env.PORT || 80
 
+const swaggerUi = require('swagger-ui-express')
+const swaggerFile = require('./swagger/swagger.json')
+
 const socket = require('./socket/socket')
 
 const serverVersion = "1.7-develop"
@@ -42,6 +45,8 @@ app.use('/trips', tripsRouter)
 app.use('/auth', authRouter)
 app.use('/parcels', parcelsRouter)
 app.use('/google', googleRouter)
+
+app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 const server = app.listen(port, () => {
     console.log(`Server has been started at port: ${port}`)

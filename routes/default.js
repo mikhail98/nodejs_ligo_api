@@ -5,10 +5,12 @@ const Config = require("../utils/config")
 const router = express.Router()
 
 router.get('/', log, async (req, res) => {
+    // #swagger.tags = ['Default']
     res.status(200).send({isWorking: true})
 })
 
 router.get('/config', log, async (req, res) => {
+    // #swagger.tags = ['Default']
     res.status(200).send({currencies: Config.getAvailableCurrencies()})
 })
 

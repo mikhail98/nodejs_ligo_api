@@ -21,6 +21,7 @@ class CronItem {
 
 //create trip
 router.post('/', log, async (req, res) => {
+    // #swagger.tags = ['Trips']
     try {
         const {driverId, startPoint, endPoint, date} = req.body
 
@@ -74,6 +75,7 @@ router.post('/', log, async (req, res) => {
 })
 
 router.get('/:id', log, auth, async (req, res) => {
+    // #swagger.tags = ['Trips']
     const trip = await Trip.findOne({_id: req.params.id})
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)
@@ -83,6 +85,7 @@ router.get('/:id', log, auth, async (req, res) => {
 })
 
 router.post('/:id/start', log, auth, async (req, res) => {
+    // #swagger.tags = ['Trips']
     const tripId = req.params.id
     const trip = await Trip.findOneAndUpdate({_id: tripId}, {status: 'ACTIVE'})
     if (!trip) {
@@ -97,6 +100,7 @@ router.post('/:id/start', log, auth, async (req, res) => {
 })
 
 router.post('/:id/complete', log, auth, async (req, res) => {
+    // #swagger.tags = ['Trips']
     const trip = await Trip.findOneAndUpdate({_id: req.params.id}, {status: 'COMPLETED'})
     if (!trip) {
         return res.status(400).send(Error.noSuchTrip)
@@ -105,6 +109,7 @@ router.post('/:id/complete', log, auth, async (req, res) => {
 })
 
 router.post('/:id/cancel', log, auth, async (req, res) => {
+    // #swagger.tags = ['Trips']
     const tripId = req.params.id
     const trip = await Trip.findOneAndUpdate({_id: tripId}, {status: 'CANCELLED'})
     if (!trip) {

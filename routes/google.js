@@ -19,6 +19,7 @@ const DIRECTIONS_UPDATE_INTERVAL_DAYS = 14
 const LOCALIZATION_UPDATE_INTERVAL_DAYS = 30
 
 router.get('/places', log, auth, async (req, res) => {
+    // #swagger.tags = ['Google']
     const text = req.query.query
 
     const result = await GooglePlace.findOne({text})
@@ -59,6 +60,7 @@ function findAndSavePlace(text, res, resultId) {
 }
 
 router.get('/directions', log, auth, async (req, res) => {
+    // #swagger.tags = ['Google']
     const origin = req.query.origin
     const destination = req.query.destination
 
@@ -125,10 +127,12 @@ function findAndSaveDirection(origin, destination, res, resultId) {
 }
 
 router.get('/localization', log, async (req, res) => {
+    // #swagger.tags = ['Google']
     await updateLocalisation(res, LOCALIZATION_UPDATE_INTERVAL_DAYS)
 })
 
 router.get('/parseLocalization', log, auth, async (req, res) => {
+    // #swagger.tags = ['Google']
     await updateLocalisation(res, 0)
 })
 
