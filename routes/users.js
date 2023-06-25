@@ -31,13 +31,20 @@ router.post('/', log, async (req, res) => {
             return res.status(400).send(Error.cannotCreateUser)
         }
 
+        let fcmTokens
+        if (fcmToken) {
+            fcmTokens = [fcmToken]
+        } else {
+            fcmTokens = []
+        }
+
         const user = await User.create({
             name: name,
             email: email.toLowerCase(),
             phone: phone,
             role: role,
             isValidated: true,
-            fcmTokens: [fcmToken],
+            fcmTokens: fcmTokens,
             passportPhotoUrl: passportPhotoUrl,
             avatarUrl: avatarUrl,
             isAdmin: false,

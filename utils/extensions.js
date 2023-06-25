@@ -6,8 +6,9 @@ const sendPushNotifications = require("../firebase/fcm")
 const Properties = require('../local/properties')
 const {OAuth2Client} = require("google-auth-library")
 
-const GOOGLE_AUTH_CLIENT_ID = process.env.GOOGLE_AUTH_CLIENT_ID || Properties.GOOGLE_AUTH_CLIENT_ID
-const client = new OAuth2Client(GOOGLE_AUTH_CLIENT_ID)
+const GOOGLE_WEB_AUTH_CLIENT_ID = process.env.GOOGLE_WEB_AUTH_CLIENT_ID || Properties.GOOGLE_WEB_AUTH_CLIENT_ID
+const GOOGLE_IOS_AUTH_CLIENT_ID = process.env.GOOGLE_IOS_AUTH_CLIENT_ID || Properties.GOOGLE_IOS_AUTH_CLIENT_ID
+const client = new OAuth2Client(GOOGLE_WEB_AUTH_CLIENT_ID)
 
 const MAX_DISTANCE = 15.0
 
@@ -120,7 +121,7 @@ async function verifyGoogleToken(email, token) {
     try {
         const ticket = await client.verifyIdToken({
             idToken: token,
-            audience: GOOGLE_AUTH_CLIENT_ID
+            audience: [GOOGLE_WEB_AUTH_CLIENT_ID, GOOGLE_IOS_AUTH_CLIENT_ID]
         });
         const payload = ticket.getPayload();
         return email === payload['email']
