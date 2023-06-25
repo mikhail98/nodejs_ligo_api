@@ -57,7 +57,6 @@ router.post('/', log, async (req, res) => {
         user.fcmTokens = []
         res.status(200).send(user)
     } catch (error) {
-        console.log("error")
         res.status(400).send(error)
     }
 })
