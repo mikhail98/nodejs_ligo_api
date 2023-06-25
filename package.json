@@ -1,5 +1,5 @@
 {
-  "name": "pingo_demo",
+  "name": "ligo_api",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -29,12 +29,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mikhail98/pingo_demo.git"
+    "url": "git+https://github.com/mikhail98/nodejs_ligo_api.git"
   },
   "keywords": [],
   "bugs": {
-    "url": "https://github.com/mikhail98/pingo_demo/issues"
+    "url": "https://github.com/mikhail98/nodejs_ligo_api/issues"
   },
-  "homepage": "https://github.com/mikhail98/pingo_demo#readme",
+  "homepage": "https://github.com/mikhail98/nodejs_ligo_api#readme",
   "description": ""
 }

@@ -5,7 +5,7 @@
     "title": "REST API",
     "description": ""
   },
-  "host": "pingo-demo.herokuapp.com",
+  "host": "ligo-sandbox-72985dd69029.herokuapp.com",
   "basePath": "/",
   "schemes": [
     "https"
