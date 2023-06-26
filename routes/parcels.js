@@ -237,10 +237,22 @@ router.post('/:id/deliver', log, auth, async (req, res) => {
 
     parcel.status = 'DELIVERED'
     Socket.emitEvent(parcel.userId, "parcelDelivered", parcel)
-    await sendPushNotifications(parcel.userId, {
-        key: "PARCEL_DELIVERED",
-        parcelId: parcelId.toString()
-    })
+
+    const trips = await Trip.find()
+    const trip = trips.find(trip => trip.parcels.map(parcelId => parcelId.toString()).includes(parcelId))
+
+    if (trip) {
+        await sendPushNotifications(parcel.userId, {
+            key: "PARCEL_DELIVERED",
+            parcelId: parcelId.toString(),
+            tripId: trip._id.toString()
+        })
+    } else {
+        await sendPushNotifications(parcel.userId, {
+            key: "PARCEL_DELIVERED",
+            parcelId: parcelId.toString()
+        })
+    }
 
     await Parcel.updateOne({_id: parcelId}, parcel)
     res.status(200).send(parcel)
