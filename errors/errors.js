@@ -7,6 +7,8 @@ const cannotCreateUser = createError(106, "Cannot create user")
 
 const userExits = createError(201, "This user also exists")
 const notADriver = createError(202, "Not a driver")
+const searchRequestRequired = createError(203, "Search request is required")
+const originAndDestinationRequired = createError(204, "Origin and destination required")
 
 const wrongPassword = createError(301, "Wrong password")
 const requiredToken = createError(302, "Token is required")
@@ -47,5 +49,7 @@ module.exports = {
     ratingExists,
     provideTokenOrPassword,
     cantFindRoute,
-    cannotCreateUser
+    cannotCreateUser,
+    searchRequestRequired,
+    originAndDestinationRequired
 }

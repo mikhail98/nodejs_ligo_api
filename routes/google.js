@@ -38,6 +38,9 @@ router.get('/places', log, auth, async (req, res) => {
 })
 
 function findAndSavePlace(text, res, resultId) {
+    if (!text) {
+        return res.status(400).send(Error.searchRequestRequired)
+    }
     const url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query=' + text + '&key=' + placesKey
 
     axios.get(url)
@@ -84,6 +87,9 @@ router.get('/directions', log, auth, async (req, res) => {
 })
 
 function findAndSaveDirection(origin, destination, res, resultId) {
+    if (!origin || !destination) {
+        return res.status(400).send(Error.originAndDestinationRequired)
+    }
     const url = 'https://maps.googleapis.com/maps/api/directions/json?origin=' + origin + '&destination=' + destination + '&departure_time=now' + '&mode=driving' + '&key=' + directionsKey
 
     axios.get(url)
