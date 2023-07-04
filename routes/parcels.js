@@ -1,17 +1,18 @@
+const axios = require("axios")
 const express = require('express')
-
-const Parcel = require('../models/parcel')
-const User = require('../models/user')
-const Secret = require('../models/secret')
 const Trip = require('../models/trip')
-const auth = require('../middleware/auth')
+const User = require('../models/user')
 const log = require('../middleware/log')
+const Error = require("../errors/errors")
+const Parcel = require('../models/parcel')
+const Secret = require('../models/secret')
+const auth = require('../middleware/auth')
 const Errors = require("../errors/errors")
 const Socket = require("../socket/socket")
-const Error = require("../errors/errors")
 const Extensions = require('../utils/extensions')
 const sendPushNotifications = require("../firebase/fcm")
-const axios = require("axios");
+const propertiesProvider = require("../utils/propertiesProvider")
+const {getTelegramChatId} = require("../utils/propertiesProvider");
 
 const router = express.Router()
 
@@ -47,9 +48,7 @@ router.post('/', log, auth, async (req, res) => {
         responseParcel.user = user
 
         const text = `New parcel!!! 📦📦📦%0A%0AId: ${createdParcel._id}`
-        const botToken = '5912813864:AAG6kpH1mNhAMygWX-oZyqs_ykMaRGZhuCs'
-        const chatId = '-1001852331705'
-        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${text}`
+        const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${getTelegramChatId()}&text=${text}`
         axios.get(telegramUrl)
             .then(() => {
             })

@@ -1,13 +1,14 @@
-const express = require('express')
+const axios = require("axios")
 const cron = require('node-cron')
+const express = require('express')
 const Trip = require('../models/trip')
 const User = require('../models/user')
+const log = require('../middleware/log')
 const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
-const log = require('../middleware/log')
-const sendPushNotifications = require("../firebase/fcm");
-const Extensions = require("../utils/extensions");
-const axios = require("axios");
+const Extensions = require("../utils/extensions")
+const sendPushNotifications = require("../firebase/fcm")
+const propertiesProvider = require("../utils/propertiesProvider")
 
 const router = express.Router()
 
@@ -70,9 +71,7 @@ router.post('/', log, async (req, res) => {
         tripResponse.driver = user
 
         const text = `New trip!!! 🚗🚗🚗%0A%0AId: ${trip._id}`
-        const botToken = '5912813864:AAG6kpH1mNhAMygWX-oZyqs_ykMaRGZhuCs'
-        const chatId = '-1001852331705'
-        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${text}`
+        const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${propertiesProvider.getTelegramChatId()}&text=${text}`
         axios.get(telegramUrl)
             .then(() => {
             })

@@ -3,12 +3,6 @@ const Trip = require("../models/trip");
 const socket = require('../socket/socket')
 const Parcel = require("../models/parcel");
 const sendPushNotifications = require("../firebase/fcm")
-const Properties = require('../local/properties')
-const {OAuth2Client} = require("google-auth-library")
-
-const GOOGLE_WEB_AUTH_CLIENT_ID = process.env.GOOGLE_WEB_AUTH_CLIENT_ID || Properties.GOOGLE_WEB_AUTH_CLIENT_ID
-const GOOGLE_IOS_AUTH_CLIENT_ID = process.env.GOOGLE_IOS_AUTH_CLIENT_ID || Properties.GOOGLE_IOS_AUTH_CLIENT_ID
-const client = new OAuth2Client(GOOGLE_WEB_AUTH_CLIENT_ID)
 
 const MAX_DISTANCE = 15.0
 
@@ -117,19 +111,6 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
 
-async function verifyGoogleToken(email, token) {
-    try {
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: [GOOGLE_WEB_AUTH_CLIENT_ID, GOOGLE_IOS_AUTH_CLIENT_ID]
-        });
-        const payload = ticket.getPayload();
-        return email === payload['email']
-    } catch (error) {
-        return false
-    }
-}
-
 module.exports = {
-    getResponseTripsById, getResponseTripById, getResponseParcelById, requestDriverForParcel, verifyGoogleToken
+    getResponseTripsById, getResponseTripById, getResponseParcelById, requestDriverForParcel
 }

@@ -1,18 +1,14 @@
-const express = require('express')
-const auth = require("../middleware/auth")
-const log = require('../middleware/log')
 const axios = require('axios')
+const express = require('express')
+const log = require('../middleware/log')
 const Error = require('../errors/errors')
-const properties = require("../local/properties")
+const auth = require("../middleware/auth")
 const GooglePlace = require('../models/google_place')
 const GoogleDirection = require('../models/google_direction')
+const propertiesProvider = require('../utils/propertiesProvider')
 const GoogleLocalization = require('../models/google_localization')
 
 const router = express.Router()
-
-const placesKey = process.env.GOOGLE_PLACES_API_KEY || properties.GOOGLE_PLACES_API_KEY
-const directionsKey = process.env.GOOGLE_DIRECTIONS_API_KEY || properties.GOOGLE_DIRECTIONS_API_KEY
-const sheetsKey = process.env.GOOGLE_SHEETS_API_KEY || properties.GOOGLE_SHEETS_API_KEY
 
 const PLACES_UPDATE_INTERVAL_DAYS = 14
 const DIRECTIONS_UPDATE_INTERVAL_DAYS = 14
@@ -41,7 +37,7 @@ function findAndSavePlace(text, res, resultId) {
     if (!text) {
         return res.status(400).send(Error.searchRequestRequired)
     }
-    const url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query=' + text + '&key=' + placesKey
+    const url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query=' + text + '&key=' + propertiesProvider.getGooglePlacesApiKey()
 
     axios.get(url)
         .then(response => {
@@ -90,7 +86,7 @@ function findAndSaveDirection(origin, destination, res, resultId) {
     if (!origin || !destination) {
         return res.status(400).send(Error.originAndDestinationRequired)
     }
-    const url = 'https://maps.googleapis.com/maps/api/directions/json?origin=' + origin + '&destination=' + destination + '&departure_time=now' + '&mode=driving' + '&key=' + directionsKey
+    const url = 'https://maps.googleapis.com/maps/api/directions/json?origin=' + origin + '&destination=' + destination + '&departure_time=now' + '&mode=driving' + '&key=' + propertiesProvider.getGoogleDirectionsApiKey()
 
     axios.get(url)
         .then(response => {
@@ -159,7 +155,7 @@ async function updateLocalisation(res, interval) {
 }
 
 function findAndSaveLocalization(res, resultId) {
-    const url = 'https://sheets.googleapis.com/v4/spreadsheets/1Ln_RLoDZYsoPXoVjJIiOqJUb5hu1vpj0AKWrwsn5xss/values/A1:F1000?majorDimension=COLUMNS&key=' + sheetsKey
+    const url = 'https://sheets.googleapis.com/v4/spreadsheets/1Ln_RLoDZYsoPXoVjJIiOqJUb5hu1vpj0AKWrwsn5xss/values/A1:F1000?majorDimension=COLUMNS&key=' + propertiesProvider.getGoogleSheetsApiKey()
 
     axios.get(url)
         .then(response => updateExistedLocalization(response, resultId, res))

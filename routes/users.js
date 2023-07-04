@@ -8,10 +8,12 @@ const Error = require('../errors/errors')
 const auth = require('../middleware/auth')
 const log = require('../middleware/log')
 const socket = require('../socket/socket')
-const sendPushNotifications = require("../firebase/fcm")
 const Extensions = require('../utils/extensions')
-const {verifyGoogleToken} = require("../utils/extensions");
-const axios = require("axios");
+const sendPushNotifications = require("../firebase/fcm")
+const propertiesProvider = require("../utils/propertiesProvider")
+const verifyGoogleToken = require("../utils/googleTokenVerifier")
+
+const axios = require("axios")
 
 const router = express.Router()
 
@@ -58,9 +60,7 @@ router.post('/', log, async (req, res) => {
         user.fcmTokens = []
 
         const text = `New user!!! 🙋🙋🙋%0A%0AName: ${user.name}%0AEmail: ${user.email}%0APhone: ${user.phone}%0ARole: ${user.role}`
-        const botToken = '5912813864:AAG6kpH1mNhAMygWX-oZyqs_ykMaRGZhuCs'
-        const chatId = '-1001852331705'
-        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${text}`
+        const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${propertiesProvider.getTelegramChatId()}&text=${text}`
         axios.get(telegramUrl)
             .then(() => {
             })

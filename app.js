@@ -2,13 +2,16 @@ const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 
+const socket = require('./socket/socket')
+
 const usersRouter = require('./routes/users')
 const authRouter = require('./routes/auth')
 const tripsRouter = require('./routes/trips')
 const googleRouter = require('./routes/google')
 const parcelsRouter = require('./routes/parcels')
 const defaultRouter = require('./routes/default')
-const properties = require('./local/properties')
+
+const propertiesProvider = require('./utils/propertiesProvider')
 
 const app = express()
 const port = process.env.PORT || 80
@@ -16,13 +19,9 @@ const port = process.env.PORT || 80
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger/swagger.json')
 
-const socket = require('./socket/socket')
-
 const serverVersion = "1.7"
 
-const mongoUrl = process.env.MONGODB_URL || properties.MONGODB_URL
-
-mongoose.connect(mongoUrl, {
+mongoose.connect(propertiesProvider.getMongoUrl(), {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })

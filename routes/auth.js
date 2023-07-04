@@ -5,7 +5,7 @@ const Error = require('../errors/errors')
 const jwt = require("jsonwebtoken")
 const auth = require("../middleware/auth")
 const log = require('../middleware/log')
-const {verifyGoogleToken} = require('../utils/extensions')
+const verifyGoogleToken = require('../utils/googleTokenVerifier')
 
 const router = express.Router()
 
