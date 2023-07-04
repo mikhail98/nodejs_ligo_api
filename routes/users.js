@@ -11,6 +11,7 @@ const socket = require('../socket/socket')
 const sendPushNotifications = require("../firebase/fcm")
 const Extensions = require('../utils/extensions')
 const {verifyGoogleToken} = require("../utils/extensions");
+const axios = require("axios");
 
 const router = express.Router()
 
@@ -55,6 +56,16 @@ router.post('/', log, async (req, res) => {
         )
         user.password = null
         user.fcmTokens = []
+
+        const text = `New user!!! 🙋🙋🙋%0A%0AName: ${user.name}%0AEmail: ${user.email}%0APhone: ${user.phone}%0ARole: ${user.role}`
+        const botToken = '5912813864:AAG6kpH1mNhAMygWX-oZyqs_ykMaRGZhuCs'
+        const chatId = '-1001852331705'
+        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${text}`
+        axios.get(telegramUrl)
+            .then(() => {
+            })
+            .catch(() => {
+            })
         res.status(200).send(user)
     } catch (error) {
         res.status(400).send(error)

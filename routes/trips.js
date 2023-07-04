@@ -7,6 +7,7 @@ const auth = require('../middleware/auth')
 const log = require('../middleware/log')
 const sendPushNotifications = require("../firebase/fcm");
 const Extensions = require("../utils/extensions");
+const axios = require("axios");
 
 const router = express.Router()
 
@@ -67,6 +68,16 @@ router.post('/', log, async (req, res) => {
         user.password = null
         user.fcmTokens = []
         tripResponse.driver = user
+
+        const text = `New trip!!! 🚗🚗🚗%0A%0AId: ${trip._id}`
+        const botToken = '5912813864:AAG6kpH1mNhAMygWX-oZyqs_ykMaRGZhuCs'
+        const chatId = '-1001852331705'
+        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${text}`
+        axios.get(telegramUrl)
+            .then(() => {
+            })
+            .catch(() => {
+            })
 
         res.status(200).send(tripResponse)
     } catch (error) {
