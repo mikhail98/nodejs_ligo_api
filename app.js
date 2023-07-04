@@ -18,7 +18,7 @@ const swaggerFile = require('./swagger/swagger.json')
 
 const socket = require('./socket/socket')
 
-const serverVersion = "1.7-develop"
+const serverVersion = "1.7"
 
 const mongoUrl = process.env.MONGODB_URL || properties.MONGODB_URL
 
