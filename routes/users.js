@@ -59,7 +59,7 @@ router.post('/', log, async (req, res) => {
         user.password = null
         user.fcmTokens = []
 
-        const text = `New user!!! 🙋🙋🙋%0A%0AName: ${user.name}%0AEmail: ${user.email}%0APhone: ${user.phone}%0ARole: ${user.role}`
+        const text = `New user!!! 🙋🙋🙋%0A%0AName: ${user.name}%0AEmail: ${user.email}%0APhone: ${user.phone}%0ARole: ${user.role}%0A%0A#new_user`
         const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${propertiesProvider.getTelegramChatId()}&text=${text}`
         axios.get(telegramUrl)
             .then(() => {
