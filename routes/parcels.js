@@ -47,7 +47,7 @@ router.post('/', log, auth, async (req, res) => {
         user.fcmTokens = []
         responseParcel.user = user
 
-        const text = `New parcel!!! 📦📦📦%0A%0AId: ${createdParcel._id}%0A%0A#new_parcel`
+        const text = `New parcel!!! 📦📦📦%0A%0AId: ${createdParcel._id}%0ARoute: ${startPoint.cityName} -> ${endPoint.cityName}%0A%0A%23new_parcel`
         const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${getTelegramChatId()}&text=${text}`
         axios.get(telegramUrl)
             .then(() => {

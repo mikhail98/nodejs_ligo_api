@@ -70,7 +70,7 @@ router.post('/', log, async (req, res) => {
         user.fcmTokens = []
         tripResponse.driver = user
 
-        const text = `New trip!!! 🚗🚗🚗%0A%0AId: ${trip._id}%0A%0A#new_trip`
+        const text = `New trip!!! 🚗🚗🚗%0A%0AId: ${trip._id}%0ARoute: ${startPoint.cityName} -> ${endPoint.cityName}%0A%0A%23new_trip`
         const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${propertiesProvider.getTelegramChatId()}&text=${text}`
         axios.get(telegramUrl)
             .then(() => {
