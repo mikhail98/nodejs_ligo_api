@@ -59,13 +59,13 @@ router.post('/', log, async (req, res) => {
         user.password = null
         user.fcmTokens = []
 
-        const text = `New user!!! 🙋🙋🙋%0A%0AName: ${user.name}%0AEmail: ${user.email}%0APhone: ${user.phone}%0ARole: ${user.role}%0A%0A%23new_user`
-        const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${propertiesProvider.getTelegramChatId()}&text=${text}`
-        axios.get(telegramUrl)
-            .then(() => {
-            })
-            .catch(() => {
-            })
+        // const text = `New user!!! 🙋🙋🙋%0A%0AName: ${user.name}%0AEmail: ${user.email}%0APhone: ${user.phone}%0ARole: ${user.role}%0A%0A%23new_user`
+        // const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${propertiesProvider.getTelegramChatId()}&text=${text}`
+        // axios.get(telegramUrl)
+        //     .then(() => {
+        //     })
+        //     .catch(() => {
+        //     })
         res.status(200).send(user)
     } catch (error) {
         res.status(400).send(error)
