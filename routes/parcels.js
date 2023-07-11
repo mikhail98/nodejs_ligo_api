@@ -47,13 +47,15 @@ router.post('/', log, auth, async (req, res) => {
         user.fcmTokens = []
         responseParcel.user = user
 
-        // const text = `New parcel!!! 📦📦📦%0A%0AId: ${createdParcel._id}%0ARoute: ${startPoint.cityName} -> ${endPoint.cityName}%0A%0A%23new_parcel`
-        // const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${getTelegramChatId()}&text=${text}`
-        // axios.get(telegramUrl)
-        //     .then(() => {
-        //     })
-        //     .catch(() => {
-        //     })
+        if (process.env.PROD) {
+            const text = `New parcel!!! 📦📦📦%0A%0AId: ${createdParcel._id}%0ARoute: ${startPoint.cityName} -> ${endPoint.cityName}%0A%0A%23new_parcel`
+            const telegramUrl = `https://api.telegram.org/bot${propertiesProvider.getTelegramBotToken()}/sendMessage?chat_id=${getTelegramChatId()}&text=${text}`
+            axios.get(telegramUrl)
+                .then(() => {
+                })
+                .catch(() => {
+                })
+        }
         res.status(200).send(responseParcel)
     } catch (error) {
         res.status(400).send(error)

@@ -21,6 +21,7 @@
     "fcm-notification": "^2.0.0",
     "firebase-admin": "^11.5.0",
     "google-auth-library": "^8.8.0",
+    "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.2",
     "node-cron": "^3.0.2",

@@ -19,7 +19,7 @@ const port = process.env.PORT || 80
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger/swagger.json')
 
-const serverVersion = "1.9"
+const serverVersion = "1.10"
 
 mongoose.connect(propertiesProvider.getMongoUrl(), {
     useNewUrlParser: true,
