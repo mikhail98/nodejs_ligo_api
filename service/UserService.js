@@ -5,8 +5,6 @@ const Rating = require("../model/rating").Rating
 
 const Error = require("../utils/errors")
 const Socket = require("../utils/socket")
-const Extensions = require("../utils/extensions")
-const ParcelStatues = require("../utils/config").ParcelStatues
 
 const createJWT = require("../utils/createJWT")
 const sendMessageToTelegramBot = require("../utils/telegram")
@@ -33,24 +31,18 @@ class UserService {
             fcmTokens = []
         }
 
-        return User.create({
+        const user = await User.create({
             name: name,
             role: role,
             phone: phone,
             fcmTokens: fcmTokens,
             email: email.toLowerCase()
         })
-            .then(user => {
-                user.token = createJWT(user._id)
-                user.fcmTokens = []
-                const text = `New user!!! 🙋🙋🙋%0A%0AName: ${user.name}%0AEmail: ${user.email}%0APhone: ${user.phone}%0ARole: ${user.role}%0A%0A%23new_user`
-                sendMessageToTelegramBot(text)
-                return res.status(200).send(user)
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(400).send(Error.unknownError)
-            })
+        user.token = createJWT(user._id)
+        user.fcmTokens = []
+        const text = `New user!!! 🙋🙋🙋%0A%0AName: ${user.name}%0AEmail: ${user.email}%0APhone: ${user.phone}%0ARole: ${user.role}%0A%0A%23new_user`
+        await sendMessageToTelegramBot(text)
+        return res.status(200).send(user)
     }
 
     static async getUserById(user, res) {
@@ -59,136 +51,81 @@ class UserService {
     }
 
     static async getUserExists(email, res) {
-        return User.findOne({email})
-            .then(user => {
-                return res.status(200).send({userExists: user !== null})
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(400).send(Error.unknownError)
-            })
+        const user = await User.findOne({email})
+        return res.status(200).send({userExists: user !== null})
     }
 
     static async updateFcmToken(user, fcmToken, res) {
         user.fcmTokens.push(fcmToken)
-        return User.updateOne({_id: user._id}, user)
-            .then(() => {
-                return res.status(200).send()
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(200).send()
-            })
+        await User.updateOne({_id: user._id}, user)
+        return res.status(200).send()
     }
 
-    static async updateAvatarPhoto(user, newAvatarPhoto, res) {
-        user.avatarPhoto = newAvatarPhoto
-        return User.updateOne({_id: user._id}, user)
-            .then(() => {
-                return res.status(200).send()
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(200).send()
-            })
+    static async updateAvatarPhoto(userId, newAvatarPhoto, res) {
+        await User.findOneAndUpdate({_id: userId}, {avatarPhoto: newAvatarPhoto})
+        return res.status(200).send()
     }
 
-    static async updatePassportPhoto(user, newPassportPhoto, res) {
-        user.passportPhoto = newPassportPhoto
-        return User.updateOne({_id: user._id}, user)
-            .then(() => {
-                return res.status(200).send()
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(200).send()
-            })
-    }
+    static async updateUserRating(userFromId, userToId, rating, res) {
+        const userTo = await User.findOne({_id: userToId})
 
-    static async updateUserRating(userFrom, userTo, rating, res) {
-        return User.findOne({_id: userTo})
-            .then(function (userTo) {
-                const ratingExists = userTo.ratings.filter(rating => {
-                    return rating.userFrom === userFrom && rating.userTo.toString() === userTo
-                }).length !== 0
+        const ratingExists = userTo.ratings.filter(rating => {
+            return rating.userFrom === userFromId && rating.userTo.toString() === userToId
+        }).length !== 0
 
-                if (ratingExists) {
-                    return res.status(400).send(Error.ratingExists)
-                }
-                userTo.ratings.push(Rating({userFrom, userTo, rating}))
-                return User.updateOne({_id: userFrom}, userTo)
-                    .then(() => {
-                        return res.status(200).send()
-                    })
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(400).send(Error.unknownError)
-            })
+        if (ratingExists) {
+            return res.status(400).send(Error.ratingExists)
+        }
+        userTo.ratings.push(Rating({userFrom: userFromId, userTo: userToId, rating: rating}))
+        await User.updateOne({_id: userToId}, userTo)
+        return res.status(200).send()
     }
 
     static async getDriverTrips(driver, res) {
-        return Trip.find({'driver._id': driver})
-            .populate("driver parcels")
-            .then(trips => {
-                trips.forEach(trip => {
-                    trip.driver.fcmTokens = []
-                })
-                res.status(200).send(trips)
+        const trips = await Trip.find({driver})
+            .populate("driver")
+            .populate({path: 'parcels', populate: {path: 'sender driver'}})
+
+        trips.forEach(trip => {
+            trip.driver.fcmTokens = []
+            trip.parcels.forEach(parcel => {
+                parcel.sender.fcmTokens = []
+                if (parcel.driver) {
+                    parcel.driver.fcmTokens = []
+                }
             })
-            .catch(error => {
-                console.log(error)
-                return res.status(400).send(Error.unknownError)
-            })
+        })
+        return res.status(200).send(trips)
     }
 
     static async getSenderParcels(sender, res) {
-        return Parcel.find({'sender._id': sender})
-            .populate("sender driver")
-            .then(parcels => {
-                parcels.forEach(parcel => {
-                    parcel.sender.fcmTokens = []
-                    if (parcel.driver) {
-                        parcel.driver.fcmTokens = []
-                    }
-                })
-                res.status(200).send(parcels)
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(400).send(Error.unknownError)
-            })
+        const parcels = await Parcel.find({sender}).populate("sender driver")
+        parcels.forEach(parcel => {
+            parcel.sender.fcmTokens = []
+            if (parcel.driver) {
+                parcel.driver.fcmTokens = []
+            }
+        })
+        return res.status(200).send(parcels)
     }
 
     static async updateDriverLocation(driverId, location, res) {
-        await User.findOneAndUpdate({_id}, {location: location})
-            .then(function (user) {
-                if (user) {
-                    return Trip.findOne({driver: driverId, status: {$in: ['ACTIVE', 'SCHEDULED']}})
-                        .populate("parcels")
-                        .then(function (trip) {
-                            trip.parcels
-                                .filter(parcel => parcel.status === 'ACCEPTED' || parcel.status === 'PICKED')
-                                .map(parcel => parcel.sender.toString())
-                                .forEach(userId => Socket.emitEvent(userId, "driverLocationUpdated", location))
+        const user = await User.findOneAndUpdate({_id: driverId}, {location: location})
 
-                            Parcel.find({status: ParcelStatues.CREATED})
-                                .then(function (parcels) {
-                                    const parcelIds = parcels.map(parcel => parcel._id.toString())
-                                    return Promise.allSettled(parcelIds.map(parcelId => Extensions.requestDriverForParcel(parcelId)))
-                                        .then(() => {
-                                            res.status(200).send()
-                                        })
-                                })
-                        })
-                } else {
-                    return res.status(400).send(Error.noSuchUser)
-                }
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(400).send(Error.unknownError)
-            })
+        if (user) {
+            const trip = await Trip.findOne({
+                driver: driverId, status: {$in: ['ACTIVE', 'SCHEDULED']}
+            }).populate("parcels")
+            if (trip) {
+                trip.parcels
+                    .filter(parcel => parcel.status === 'ACCEPTED' || parcel.status === 'PICKED')
+                    .map(parcel => parcel.sender.toString())
+                    .forEach(userId => Socket.emitEvent(userId, "driverLocationUpdated", location))
+            }
+            return res.status(200).send()
+        } else {
+            return res.status(400).send(Error.noSuchUser)
+        }
     }
 }
 

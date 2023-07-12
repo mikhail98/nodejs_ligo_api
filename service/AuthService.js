@@ -31,21 +31,14 @@ class AuthService {
     }
 
     static async logout(user, fcmToken, res) {
-        const _id = user._id
-        user.fcmTokens = user.fcmTokens.filter(token => token !== fcmToken)
+        const newFcmTokens = user.fcmTokens.filter(token => token !== fcmToken)
 
-        return User.updateOne({_id}, user)
-            .then(() => {
-                return res.status(200).send()
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(400).send(Error.unknownError)
-            })
+        await User.findOneAndUpdate({_id: user._id}, {fcmTokens: newFcmTokens})
+        return res.status(200).send()
     }
 
     static async deleteUser(user, res) {
-        return User.updateOne(
+        await User.updateOne(
             {
                 _id: user._id
             }, {
@@ -57,21 +50,13 @@ class AuthService {
                 fcmTokens: [],
                 location: null,
                 isAdmin: false,
-                avatarUrl: null,
                 isDeleted: true,
-                passportPhotoUrl: null
+                avatarPhoto: null,
             }
         )
-            .then(function () {
-                return DeletedUser.create({userId: user._id, email: user.email})
-                    .then(() => {
-                        return res.status(200).send()
-                    })
-            })
-            .catch(error => {
-                console.log(error)
-                return res.status(400).send(Error.unknownError)
-            })
+
+        await DeletedUser.create({userId: user._id, email: user.email})
+        return res.status(200).send()
     }
 
 }

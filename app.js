@@ -11,6 +11,8 @@ const googleRouter = require('./route/google')
 const parcelsRouter = require('./route/parcels')
 const defaultRouter = require('./route/default')
 
+const MatchingService = require('./service/MatchingService')
+
 const propertiesProvider = require('./utils/propertiesProvider')
 
 const app = express()
@@ -51,5 +53,7 @@ const server = app.listen(port, () => {
     console.log(`Server has been started at port: ${port}`)
     console.log(`Server version: ${serverVersion}`)
 })
+
+MatchingService.startMatchingJob()
 
 socket.initSocket(server)

@@ -1,5 +1,7 @@
 const router = require('express').Router()
 
+const Error = require("../utils/errors")
+
 const log = require('../middleware/log')
 const auth = require('../middleware/auth')
 
@@ -9,49 +11,89 @@ router.post('/', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
     const {startPoint, endPoint, types, weight, price} = req.body
-    return ParcelService.createParcel(req.user, startPoint, endPoint, types, weight, price, res)
+    try {
+        return await ParcelService.createParcel(req.user, startPoint, endPoint, types, weight, price, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.post('/:id/secret', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
-    return ParcelService.createSecretForParcel(req.user._id, req.params.id, req.body.secret, res)
+    try {
+        return await ParcelService.createSecretForParcel(req.user._id, req.params.id, req.body.secret, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.get('/:id/secret', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
-    return ParcelService.getSecretForParcel(req.user._id, req.params.id, res)
+    try {
+        return await ParcelService.getSecretForParcel(req.user._id, req.params.id, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.get('/:id', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
-    return ParcelService.getParcelById(req.params.id, res)
+    try {
+        return await ParcelService.getParcelById(req.params.id, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.post('/:id/accept', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
-    return ParcelService.acceptParcel(req.user._id, req.params.id, res)
+    try {
+        return await ParcelService.acceptParcel(req.user._id, req.params.id, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.post('/:id/decline', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
-    return ParcelService.declineParcel(req.user._id, req.params.id, res)
+    try {
+        return await ParcelService.declineParcel(req.user._id, req.params.id, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.post('/:id/pickup', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
-    return ParcelService.pickupParcel(req.user._id, req.body.tripId, req.params.id, res)
+    try {
+        return await ParcelService.pickupParcel(req.user._id, req.params.id, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.post('/:id/cancel', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
-    return ParcelService.cancelParcel(req.user._id, req.params.id, res)
+    try {
+        return await ParcelService.cancelParcel(req.user._id, req.params.id, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.post('/:id/reject', log, auth, async (req, res) => {
@@ -59,7 +101,12 @@ router.post('/:id/reject', log, auth, async (req, res) => {
 
     const parcelId = req.params.id
     const {tripId, rejectReason, rejectComment, rejectPhotoUrl} = req.body
-    return ParcelService.rejectParcel(tripId, parcelId, rejectReason, rejectComment, rejectPhotoUrl, res)
+    try {
+        return await ParcelService.rejectParcel(req.user._id, parcelId, rejectReason, rejectComment, rejectPhotoUrl, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 router.post('/:id/deliver', log, auth, async (req, res) => {
@@ -67,7 +114,12 @@ router.post('/:id/deliver', log, auth, async (req, res) => {
 
     const parcelId = req.params.id
     const {tripId, secret} = req.body
-    return ParcelService.deliverParcel(tripId, parcelId, secret, res)
+    try {
+        return await ParcelService.deliverParcel(tripId, parcelId, secret, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
 })
 
 module.exports = router

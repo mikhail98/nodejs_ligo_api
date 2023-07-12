@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
     isDeleted: {type: Boolean},
     fcmTokens: [{type: String}],
     avatarPhoto: {type: String},
-    passportPhoto: {type: String},
     location: {type: pointSchema},
     ratings: [{type: ratingSchema}],
     name: {type: String, required: true},
