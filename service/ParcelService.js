@@ -4,12 +4,12 @@ const Secret = require("../model/secret")
 
 const Error = require("../utils/errors")
 const Socket = require("../utils/socket")
+const Extensions = require("../utils/extensions")
 
 const ParcelStatues = require("../utils/config").ParcelStatues
 
 const sendPushNotifications = require("../utils/fcm")
 const sendMessageToTelegramBot = require("../utils/telegram")
-
 
 class ParcelService {
 
@@ -33,7 +33,7 @@ class ParcelService {
                 return Parcel.findOne({_id: parcel._id})
                     .populate("sender")
                     .then(parcel => {
-                        //TODO request driver for parcel
+                        Extensions.requestDriverForParcel(parcel._id)
                         parcel.sender.fcmTokens = []
                         const text = `New parcel!!! 📦📦📦%0A%0AId: ${parcel._id}%0ARoute: ${startPoint.cityName} -> ${endPoint.cityName}%0A%0A%23new_parcel`
                         sendMessageToTelegramBot(text)
