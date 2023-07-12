@@ -10,18 +10,20 @@ const notADriver = createError(202, "Not a driver")
 const searchRequestRequired = createError(203, "Search request is required")
 const originAndDestinationRequired = createError(204, "Origin and destination required")
 
-const wrongPassword = createError(301, "Wrong password")
 const requiredToken = createError(302, "Token is required")
 const invalidToken = createError(303, "Invalid token")
 const youNeedAdminRights = createError(304, "You need to be an admin to do that")
 const accessDenied = createError(305, "Access denied")
 const notInYouTrip = createError(306, "This parcel is not in your trip")
 const parcelInActiveTrip = createError(307, "This parcel is in active trip")
-const provideTokenOrPassword = createError(308, "Provide token or password")
+const provideTokenOrPassword = createError(308, "Provide token")
+const invalidGoogleToken = createError(309, "Invalid Google token")
 
 const driverHasActiveTrip = createError(401, "Driver has active an trip")
 const pointsAreTheSame = createError(402, "startPoint can't be equal to endPoint")
 const ratingExists = createError(403, "Rating exists")
+
+const unknownError = createError(501, "Unknown error")
 
 function createError(code, msg) {
     return {
@@ -31,7 +33,6 @@ function createError(code, msg) {
 }
 
 module.exports = {
-    wrongPassword,
     noSuchUser,
     pointsAreTheSame,
     notADriver,
@@ -51,5 +52,7 @@ module.exports = {
     cantFindRoute,
     cannotCreateUser,
     searchRequestRequired,
-    originAndDestinationRequired
+    originAndDestinationRequired,
+    invalidGoogleToken,
+    unknownError
 }

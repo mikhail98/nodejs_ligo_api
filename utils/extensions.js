@@ -1,8 +1,8 @@
-const User = require("../models/user");
-const Trip = require("../models/trip");
-const socket = require('../socket/socket')
-const Parcel = require("../models/parcel");
-const sendPushNotifications = require("../firebase/fcm")
+const User = require("../model/user");
+const Trip = require("../model/trip");
+const socket = require('./socket')
+const Parcel = require("../model/parcel");
+const sendPushNotifications = require("./fcm")
 
 const MAX_DISTANCE = 15.0
 
@@ -19,7 +19,6 @@ async function getResponseTripById(_id) {
     )
     const user = await User.findOne({_id: responseTrip.driverId})
     if (user) {
-        user.password = null
         user.fcmTokens = []
     }
     responseTrip.driver = user
@@ -30,8 +29,8 @@ async function getResponseParcelById(_id) {
     const responseParcel = (await Parcel.findOne({_id})).toObject()
     const user = await User.findOne({_id: responseParcel.userId})
     if (user) {
-        user.password = null
-        user.fcmTokens = []
+        delete user.fcmTokens
+        delete user.token
     }
     responseParcel.user = user
     return responseParcel
@@ -70,6 +69,7 @@ async function requestDriverForParcel(parcelId) {
 }
 
 async function notifyDriver(driver, parcel) {
+    return
     if (!parcel.notifiedDrivers.includes(driver._id)) {
         parcel.notifiedDrivers.push(driver._id)
     }
@@ -78,7 +78,6 @@ async function notifyDriver(driver, parcel) {
     const responseParcel = parcel.toObject()
     const user = await User.findOne({_id: parcel.userId})
     if (user) {
-        user.password = null
         user.fcmTokens = []
     }
     responseParcel.user = user

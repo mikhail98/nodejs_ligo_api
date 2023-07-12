@@ -1,20 +1,13 @@
-const admin = require("firebase-admin")
+const User = require("../model/user")
+
 const FCM = require('fcm-notification')
-const serviceAccount = require("./pingo-demo-private-key.json")
-const certPath = admin.credential.cert(serviceAccount)
-const User = require("../models/user")
-const FCMClient = new FCM(certPath)
+const FCMClient = new FCM(require("firebase-admin").credential.cert(require("./ligo-private-key.json")))
 
 async function sendPushNotification(fcmToken, data, callback) {
     try {
-        let message = {
-            android: {
-                data: data,
-            },
-            token: fcmToken
-        }
+        let message = {android: {data: data}, token: fcmToken}
 
-        FCMClient.send(message, function (error, resp) {
+        FCMClient.send(message, function (error) {
             callback(fcmToken, !error)
         })
 
