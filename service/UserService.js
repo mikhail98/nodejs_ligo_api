@@ -120,7 +120,13 @@ class UserService {
                 trip.parcels
                     .filter(parcel => parcel.status === 'ACCEPTED' || parcel.status === 'PICKED')
                     .map(parcel => parcel.sender.toString())
-                    .forEach(userId => Socket.emitEvent(userId, "driverLocationUpdated", location))
+                    .filter(function onlyUnique(value, index, array) {
+                        return array.indexOf(value) === index;
+                    })
+                    .forEach(senderId => Socket.emitEvent(senderId, "driverLocationUpdated", {
+                        userId: driverId,
+                        location: location
+                    }))
             }
             return res.status(200).send()
         } else {
