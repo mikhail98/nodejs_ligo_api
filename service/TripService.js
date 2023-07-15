@@ -48,8 +48,8 @@ class TripService {
         }
     }
 
-    static async cancelTrip(tripId, res) {
-        const trip = await Trip.findOneAndUpdate({_id: tripId}, {status: 'CANCELLED'})
+    static async finishTrip(tripId, res) {
+        const trip = await Trip.findOneAndUpdate({_id: tripId}, {status: 'FINISHED'})
         if (trip) {
             const job = cronList.find(cronItem => cronItem.tripId === tripId)
             if (job) {
@@ -68,15 +68,6 @@ class TripService {
         if (trip) {
             trip.driver.fcmTokens = []
             return res.status(200).send(trip)
-        } else {
-            return res.status(400).send(Error.noSuchTrip)
-        }
-    }
-
-    static async completeTrip(tripId, res) {
-        const trip = await Trip.findOneAndUpdate({_id: tripId}, {status: 'COMPLETED'})
-        if (trip) {
-            return res.status(200).send()
         } else {
             return res.status(400).send(Error.noSuchTrip)
         }

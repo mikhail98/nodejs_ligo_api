@@ -8,7 +8,7 @@ const tripSchema = new mongoose.Schema({
     parcels: [{type: mongoose.Schema.Types.ObjectId, ref: 'Parcel'}],
     status: {
         type: String,
-        enum: ['SCHEDULED', 'ACTIVE', 'COMPLETED', 'CANCELLED'],
+        enum: ['SCHEDULED', 'ACTIVE', 'FINISHED'],
         required: true
     }
 }, {timestamps: true})
