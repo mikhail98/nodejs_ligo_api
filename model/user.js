@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const pointSchema = require('./point')
+const locationSchema = require('./location')
 const ratingSchema = require('./rating').ratingSchema
 
 const userSchema = new mongoose.Schema({
@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema({
     isDeleted: {type: Boolean},
     fcmTokens: [{type: String}],
     avatarPhoto: {type: String},
-    location: {type: pointSchema},
     ratings: [{type: ratingSchema}],
+    location: {type: locationSchema},
     name: {type: String, required: true},
     phone: {type: String, required: true},
     email: {type: String, unique: true, required: true},

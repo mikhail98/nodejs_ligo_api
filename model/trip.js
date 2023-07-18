@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
-const pointSchema = require('./point')
+const locationSchema = require('./location')
 
 const tripSchema = new mongoose.Schema({
     driver: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-    startPoint: {type: pointSchema, required: true},
-    endPoint: {type: pointSchema, required: true},
+    startPoint: {type: locationSchema, required: true},
+    endPoint: {type: locationSchema, required: true},
     parcels: [{type: mongoose.Schema.Types.ObjectId, ref: 'Parcel'}],
     status: {
         type: String,

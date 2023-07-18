@@ -70,7 +70,7 @@ class UserService {
         const userTo = await User.findOne({_id: userToId})
 
         const ratingExists = userTo.ratings.filter(rating => {
-            return rating.userFrom === userFromId && rating.userTo.toString() === userToId
+            return rating.userFrom.equals(userFromId) && rating.userTo.toString() === userToId
         }).length !== 0
 
         if (ratingExists) {
@@ -82,8 +82,7 @@ class UserService {
     }
 
     static async getDriverTrips(driver, res) {
-        const trips = await Trip.find({driver})
-            .populate("driver")
+        const trips = await Trip.find({driver}).populate("driver")
             .populate({path: 'parcels', populate: {path: 'sender driver'}})
 
         trips.forEach(trip => {

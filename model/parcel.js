@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const pointSchema = require("./point")
 const priceSchema = require("./price")
+const locationSchema = require("./location")
 const ParcelStatues = require("../utils/config").ParcelStatues
 
 const parcelSchema = new mongoose.Schema({
@@ -10,8 +10,8 @@ const parcelSchema = new mongoose.Schema({
     notifiedDrivers: [{type: String}],
     driversBlacklist: [{type: String}],
     price: {type: priceSchema, required: true},
-    endPoint: {type: pointSchema, required: true},
-    startPoint: {type: pointSchema, required: true},
+    endPoint: {type: locationSchema, required: true},
+    startPoint: {type: locationSchema, required: true},
     sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     driver: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     rejectReason: {type: String, enum: ['PARCEL_TOO_BIG', 'CANT_FIND_SENDER', 'PARCEL_ILLEGAL', 'OTHER'],},
