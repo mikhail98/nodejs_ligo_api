@@ -10,20 +10,9 @@ const ParcelService = require("../service/ParcelService")
 router.post('/', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
-    const {startPoint, endPoint, types, weight, price} = req.body
+    const {startPoint, endPoint, types, weight, price, secret} = req.body
     try {
-        return await ParcelService.createParcel(req.user, startPoint, endPoint, types, weight, price, res)
-    } catch (error) {
-        console.log(error)
-        return res.status(400).send(Error.unknownError)
-    }
-})
-
-router.post('/:id/secret', log, auth, async (req, res) => {
-    // #swagger.tags = ['Parcels']
-
-    try {
-        return await ParcelService.createSecretForParcel(req.user._id, req.params.id, req.body.secret, res)
+        return await ParcelService.createParcel(req.user, startPoint, endPoint, types, weight, price, secret, res)
     } catch (error) {
         console.log(error)
         return res.status(400).send(Error.unknownError)

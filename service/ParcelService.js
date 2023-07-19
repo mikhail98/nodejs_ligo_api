@@ -11,7 +11,7 @@ const sendPushNotifications = require("../utils/fcm")
 const sendMessageToTelegramBot = require("../utils/telegram")
 
 class ParcelService {
-    static async createParcel(user, startPoint, endPoint, types, weight, price, res) {
+    static async createParcel(user, startPoint, endPoint, types, weight, price, secret, res) {
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
         }
@@ -28,6 +28,7 @@ class ParcelService {
             startPoint: startPoint
         })
 
+        await Secret.create({userId: user._id, parcelId: parcel._id, secret})
         parcel = await Parcel.findOne({_id: parcel._id}).populate("sender")
         parcel.sender.fcmTokens = []
         if (parcel.driver) {
@@ -38,10 +39,6 @@ class ParcelService {
         await sendMessageToTelegramBot(text)
 
         return res.status(200).send(parcel)
-    }
-
-    static async createSecretForParcel(userId, parcelId, secret, res) {
-        return res.status(200).send(await Secret.create({userId, parcelId, secret}))
     }
 
     static async getSecretForParcel(userId, parcelId, res) {
