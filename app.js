@@ -2,14 +2,16 @@ const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 
-const socket = require('./socket/socket')
+const socket = require('./utils/socket')
 
-const usersRouter = require('./routes/users')
-const authRouter = require('./routes/auth')
-const tripsRouter = require('./routes/trips')
-const googleRouter = require('./routes/google')
-const parcelsRouter = require('./routes/parcels')
-const defaultRouter = require('./routes/default')
+const usersRouter = require('./route/users')
+const authRouter = require('./route/auth')
+const tripsRouter = require('./route/trips')
+const googleRouter = require('./route/google')
+const parcelsRouter = require('./route/parcels')
+const defaultRouter = require('./route/default')
+
+const MatchingService = require('./service/MatchingService')
 
 const propertiesProvider = require('./utils/propertiesProvider')
 
@@ -19,7 +21,7 @@ const port = process.env.PORT || 80
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger/swagger.json')
 
-const serverVersion = "1.10"
+const serverVersion = "2.0"
 
 mongoose.connect(propertiesProvider.getMongoUrl(), {
     useNewUrlParser: true,
@@ -51,5 +53,7 @@ const server = app.listen(port, () => {
     console.log(`Server has been started at port: ${port}`)
     console.log(`Server version: ${serverVersion}`)
 })
+
+MatchingService.startMatchingJob()
 
 socket.initSocket(server)
