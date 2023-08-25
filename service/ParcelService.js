@@ -219,6 +219,21 @@ class ParcelService {
             return res.status(400).send(Error.noSecretForThisParcel)
         }
     }
+
+    static async getParcelByIdAndSecret(parcelId, secret, res) {
+        const parcelSecret = await Secret.findOne({parcelId})
+        if (parcelSecret) {
+            if (parcelSecret.secret === secret) {
+                const parcel = await Parcel.findOne({_id: parcelId}).populate("sender driver")
+                return res.status(200).send(parcel)
+            } else {
+                return res.status(400).send(Error.accessDenied)
+            }
+        } else {
+            return res.status(400).send(Error.accessDenied)
+        }
+
+    }
 }
 
 module.exports = ParcelService
