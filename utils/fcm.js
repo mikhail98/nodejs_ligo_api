@@ -5,7 +5,19 @@ const FCMClient = new FCM(require("firebase-admin").credential.cert(require("./l
 
 async function sendPushNotification(fcmToken, data, callback) {
     try {
-        let message = {android: {data: data}, token: fcmToken}
+        let message = {
+            android: {
+                data: data
+            },
+            apns: {
+                payload: {
+                    aps: {
+                        data: data
+                    }
+                }
+            },
+            token: fcmToken
+        }
 
         FCMClient.send(message, function (error) {
             callback(fcmToken, !error)
