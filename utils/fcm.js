@@ -12,7 +12,10 @@ async function sendPushNotification(fcmToken, data, callback) {
             apns: {
                 payload: {
                     aps: {
-                        data: data
+                        alert: {
+                            locKey: data.key,
+                            locArgs: [JSON.stringify(data)]
+                        }
                     }
                 }
             },
@@ -22,7 +25,6 @@ async function sendPushNotification(fcmToken, data, callback) {
         FCMClient.send(message, function (error) {
             callback(fcmToken, !error)
         })
-
     } catch (error) {
         callback(fcmToken, false)
     }
