@@ -15,7 +15,8 @@ async function sendPushNotification(fcmToken, data, callback) {
                         alert: {
                             locKey: data.key,
                             locArgs: [JSON.stringify(data)]
-                        }
+                        },
+                        'mutable-content': 1
                     }
                 }
             },
