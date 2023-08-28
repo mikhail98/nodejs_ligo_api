@@ -3,11 +3,21 @@ const User = require("../model/user")
 const FCM = require('fcm-notification')
 const FCMClient = new FCM(require("firebase-admin").credential.cert(require("./ligo-private-key.json")))
 
+async function sendPushNotifications(userId, data) {
+    const user = await User.findOne({_id: userId})
+    if (!user) return
+    const sourceTokens = user.fcmTokens
+
+    for await (const token of sourceTokens) {
+        await sendPushNotification(token, data, function (token, isSuccessful) {})
+    }
+}
+
 async function sendPushNotification(fcmToken, data, callback) {
     try {
         let message = {
             android: {
-                data: data
+                data : { data: JSON.stringify(data) }
             },
             apns: {
                 payload: {
@@ -27,28 +37,9 @@ async function sendPushNotification(fcmToken, data, callback) {
             callback(fcmToken, !error)
         })
     } catch (error) {
+        console.log(error)
         callback(fcmToken, false)
     }
-}
-
-async function sendPushNotifications(userId, data) {
-    const user = await User.findOne({_id: userId})
-    if (!user) return
-
-    const sourceTokens = user.fcmTokens
-    const resultTokens = []
-    sourceTokens.forEach(token => {
-        sendPushNotification(token, data, async function (token, isSuccessful) {
-            if (isSuccessful) {
-                resultTokens.push(token)
-            } else {
-                resultTokens.push(null)
-            }
-            if (resultTokens.length === sourceTokens.length) {
-                await User.updateOne({_id: userId}, {fcmTokens: resultTokens.filter(token => token)})
-            }
-        })
-    })
 }
 
 module.exports = sendPushNotifications

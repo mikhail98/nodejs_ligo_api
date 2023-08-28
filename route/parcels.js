@@ -102,9 +102,9 @@ router.post('/:id/deliver', log, auth, async (req, res) => {
     // #swagger.tags = ['Parcels']
 
     const parcelId = req.params.id
-    const {tripId, secret} = req.body
+    const {secret} = req.body
     try {
-        return await ParcelService.deliverParcel(tripId, parcelId, secret, res)
+        return await ParcelService.deliverParcel(parcelId, secret, res)
     } catch (error) {
         console.log(error)
         return res.status(400).send(Error.unknownError)
