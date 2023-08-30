@@ -44,6 +44,7 @@ async function requestDriversForParcels() {
 async function requestDriverForParcel(parcel, activeTrips) {
     const suitableDrivers = activeTrips
         .filter(trip => trip.driver.location !== undefined)
+        .filter(trip => trip.driver.location !== null)
         .filter(trip => {
             if (trip.status === 'ACTIVE') {
                 return getDistanceBetween(parcel.startPoint, trip.driver.location) < MAX_DISTANCE

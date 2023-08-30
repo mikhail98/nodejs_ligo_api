@@ -190,7 +190,7 @@ class ParcelService {
         }
     }
 
-    static async deliverParcel(tripId, parcelId, secret, res) {
+    static async deliverParcel(parcelId, secret, res) {
         const parcelSecret = await Secret.findOne({parcelId})
         if (parcelSecret) {
             if (parcelSecret.secret === secret) {
@@ -207,9 +207,7 @@ class ParcelService {
                 }
                 const senderId = parcel.sender._id.toString()
                 Socket.emitEvent(senderId, "parcelDelivered", parcel)
-                await sendPushNotifications(senderId, {
-                    key: "PARCEL_DELIVERED", parcelId: parcelId, tripId: tripId
-                })
+                await sendPushNotifications(senderId, {key: "PARCEL_DELIVERED", parcelId: parcelId})
 
                 return res.status(200).send(parcel)
             } else {
@@ -218,6 +216,21 @@ class ParcelService {
         } else {
             return res.status(400).send(Error.noSecretForThisParcel)
         }
+    }
+
+    static async getParcelByIdAndSecret(parcelId, secret, res) {
+        const parcelSecret = await Secret.findOne({parcelId})
+        if (parcelSecret) {
+            if (parcelSecret.secret === secret) {
+                const parcel = await Parcel.findOne({_id: parcelId}).populate("sender driver")
+                return res.status(200).send(parcel)
+            } else {
+                return res.status(400).send(Error.accessDenied)
+            }
+        } else {
+            return res.status(400).send(Error.accessDenied)
+        }
+
     }
 }
 

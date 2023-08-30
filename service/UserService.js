@@ -56,7 +56,9 @@ class UserService {
     }
 
     static async updateFcmToken(user, fcmToken, res) {
-        user.fcmTokens.push(fcmToken)
+        if (!user.fcmTokens.includes(fcmToken)) {
+            user.fcmTokens.push(fcmToken)
+        }
         await User.updateOne({_id: user._id}, user)
         return res.status(200).send()
     }
