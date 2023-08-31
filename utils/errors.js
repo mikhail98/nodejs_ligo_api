@@ -25,6 +25,8 @@ const ratingExists = createError(403, "Rating exists")
 
 const unknownError = createError(501, "Unknown error")
 
+const userNotInThisChat = createError(601, "User not in this chat")
+
 function createError(code, msg) {
     return {
         errorCode: code,
@@ -54,5 +56,6 @@ module.exports = {
     searchRequestRequired,
     originAndDestinationRequired,
     invalidGoogleToken,
-    unknownError
+    unknownError,
+    userNotInThisChat
 }

@@ -8,7 +8,7 @@ const attachmentSchema = new mongoose.Schema({
         videoUrl: {type: String},
         audioUrl: {type: String},
         location: {type: locationSchema},
-    }, {timestamps: true}
+    }
 )
 
 module.exports = attachmentSchema

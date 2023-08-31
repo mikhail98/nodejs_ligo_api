@@ -5,6 +5,7 @@ const Error = require("../utils/errors")
 const log = require('../middleware/log')
 const auth = require('../middleware/auth')
 
+const ChatService = require("../service/ChatService")
 const ParcelService = require("../service/ParcelService")
 
 router.post('/', log, auth, async (req, res) => {
