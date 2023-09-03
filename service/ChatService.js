@@ -18,7 +18,10 @@ class ChatService {
     }
 
     static async getChatForParcel(userId, parcelId, res) {
-        const chat = await Chat.findOne({parcel: parcelId}).populate("parcel driver sender messages")
+        const chat = await Chat.findOne({parcel: parcelId})
+            .populate("parcel driver sender messages")
+            .populate({path: 'parcel', populate: {path: 'sender'}})
+
         const driverId = chat.driver._id.toString()
         const senderId = chat.sender._id.toString()
         if (userId !== driverId && userId !== senderId) {
@@ -26,6 +29,7 @@ class ChatService {
         } else {
             chat.driver.fcmTokens = []
             chat.sender.fcmTokens = []
+            chat.parcel.sender.fcmTokens = []
             return res.status(200).send(chat)
         }
     }
@@ -37,9 +41,12 @@ class ChatService {
                 {sender: userId}
             ]
         }).populate("parcel driver sender messages")
+            .populate({path: 'parcel', populate: {path: 'sender'}})
+
         chats.forEach(chat=>{
             chat.driver.fcmTokens = []
             chat.sender.fcmTokens = []
+            chat.parcel.sender.fcmTokens = []
         })
         return res.status(200).send(chats)
     }
@@ -52,8 +59,6 @@ class ChatService {
 
         const driverId = chat.driver.toString()
         const senderId = chat.sender.toString()
-
-        console.log(driverId)
 
         if (authorId !== driverId && authorId !== senderId) {
             return res.status(400).send(Error.userNotInThisChat)
