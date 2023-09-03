@@ -24,6 +24,8 @@ class ChatService {
         if (userId !== driverId && userId !== senderId) {
             return res.status(400).send(Error.userNotInThisChat)
         } else {
+            chat.driver.fcmTokens = []
+            chat.sender.fcmTokens = []
             return res.status(200).send(chat)
         }
     }
@@ -35,6 +37,10 @@ class ChatService {
                 {sender: userId}
             ]
         }).populate("parcel driver sender messages")
+        chats.forEach(chat=>{
+            chat.driver.fcmTokens = []
+            chat.sender.fcmTokens = []
+        })
         return res.status(200).send(chats)
     }
 
