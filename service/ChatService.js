@@ -19,8 +19,8 @@ class ChatService {
 
     static async getChatForParcel(userId, parcelId, res) {
         const chat = await Chat.findOne({parcel: parcelId}).populate("parcel driver sender messages")
-        const driverId = chat.driver.toString()
-        const senderId = chat.sender.toString()
+        const driverId = chat.driver._id.toString()
+        const senderId = chat.sender._id.toString()
         if (userId !== driverId && userId !== senderId) {
             return res.status(400).send(Error.userNotInThisChat)
         } else {
@@ -29,7 +29,12 @@ class ChatService {
     }
 
     static async getChats(userId, res) {
-        const chats = await Chat.find({user: userId}).populate("parcel driver sender messages")
+        const chats = await Chat.find({
+            $or: [
+                {driver: userId},
+                {sender: userId}
+            ]
+        }).populate("parcel driver sender messages")
         return res.status(200).send(chats)
     }
 
