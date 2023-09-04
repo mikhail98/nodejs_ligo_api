@@ -62,7 +62,7 @@ class UserService {
 
     static async getUserExists(email, res) {
         const user = await User.findOne({email})
-        return res.status(200).send({userExists: user !== null})
+        return res.status(200).send({userExists: user !== null && user.isDeleted !== true})
     }
 
     static async updateFcmToken(user, fcmToken, res) {

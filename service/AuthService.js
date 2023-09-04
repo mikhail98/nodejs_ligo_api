@@ -52,6 +52,7 @@ class AuthService {
             {
                 _id: user._id
             }, {
+                email: user._id.toString(),
                 ratings: [],
                 token: null,
                 fcmTokens: [],
