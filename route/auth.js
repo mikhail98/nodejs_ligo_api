@@ -11,9 +11,9 @@ const AuthService = require('../service/AuthService')
 router.post('/login', log, async (req, res) => {
     // #swagger.tags = ['Auth']
 
-    const {email, googleToken} = req.body
+    const {email, appleToken, googleToken} = req.body
     try {
-        return await AuthService.login(email, googleToken, res)
+        return await AuthService.login(email, appleToken, googleToken, res)
     } catch (error) {
         console.log(error)
         return res.status(400).send(Error.unknownError)

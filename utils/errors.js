@@ -18,6 +18,7 @@ const notInYouTrip = createError(306, "This parcel is not in your trip")
 const parcelInActiveTrip = createError(307, "This parcel is in active trip")
 const provideTokenOrPassword = createError(308, "Provide token")
 const invalidGoogleToken = createError(309, "Invalid Google token")
+const invalidAppleToken = createError(310, "Invalid Apple token")
 
 const driverHasActiveTrip = createError(401, "Driver has active an trip")
 const pointsAreTheSame = createError(402, "startPoint can't be equal to endPoint")
@@ -57,5 +58,6 @@ module.exports = {
     originAndDestinationRequired,
     invalidGoogleToken,
     unknownError,
-    userNotInThisChat
+    userNotInThisChat,
+    invalidAppleToken
 }
