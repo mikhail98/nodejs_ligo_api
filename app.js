@@ -4,9 +4,10 @@ const bodyParser = require('body-parser')
 
 const socket = require('./utils/socket')
 
-const usersRouter = require('./route/users')
 const authRouter = require('./route/auth')
+const usersRouter = require('./route/users')
 const tripsRouter = require('./route/trips')
+const chatsRouter = require('./route/chats')
 const googleRouter = require('./route/google')
 const parcelsRouter = require('./route/parcels')
 const defaultRouter = require('./route/default')
@@ -21,7 +22,7 @@ const port = process.env.PORT || 80
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger/swagger.json')
 
-const serverVersion = "2.1"
+const serverVersion = "2.2"
 
 mongoose.connect(propertiesProvider.getMongoUrl(), {
     useNewUrlParser: true,
@@ -41,12 +42,12 @@ app.use(function (req, res, next) {
     next()
 })
 app.use('/', defaultRouter)
+app.use('/auth', authRouter)
+app.use('/chats', chatsRouter)
 app.use('/users', usersRouter)
 app.use('/trips', tripsRouter)
-app.use('/auth', authRouter)
-app.use('/parcels', parcelsRouter)
 app.use('/google', googleRouter)
-
+app.use('/parcels', parcelsRouter)
 app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 const server = app.listen(port, () => {

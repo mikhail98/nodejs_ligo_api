@@ -12,10 +12,10 @@ const UserService = require('../service/UserService')
 router.post('/', log, async (req, res) => {
     // #swagger.tags = ['Users']
 
-    const {name, email, phone, role, fcmToken, googleToken} = req.body
+    const {name, email, phone, role, fcmToken, googleToken, appleToken} = req.body
 
     try {
-        return await UserService.createUser(name, email, phone, role, fcmToken, googleToken, res)
+        return await UserService.createUser(name, email, phone, role, fcmToken, googleToken, appleToken, res)
     } catch (error) {
         console.log(error)
         return res.status(400).send(Error.unknownError)

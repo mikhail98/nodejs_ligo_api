@@ -28,39 +28,4 @@ router.get('/config', log, async (req, res) => {
     }
 })
 
-if (process.env.DEBUG) {
-    router.get('/users228', log, async (req, res) => {
-        // #swagger.tags = ['Default']
-
-        try {
-            return await DefaultService.getUsersCsv(res)
-        } catch (error) {
-            console.log(error)
-            return res.status(400).send(Error.unknownError)
-        }
-    })
-
-    router.get('/trips228', log, async (req, res) => {
-        // #swagger.tags = ['Default']
-
-        try {
-            return await DefaultService.getTripsCsv(res)
-        } catch (error) {
-            console.log(error)
-            return res.status(400).send(Error.unknownError)
-        }
-    })
-
-    router.get('/parcels228', log, async (req, res) => {
-        // #swagger.tags = ['Default']
-
-        try {
-            return await DefaultService.getParcelsCsv(res)
-        } catch (error) {
-            console.log(error)
-            return res.status(400).send(Error.unknownError)
-        }
-    })
-}
-
 module.exports = router

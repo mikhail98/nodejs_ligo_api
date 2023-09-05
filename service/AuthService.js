@@ -3,12 +3,13 @@ const DeletedUser = require("../model/deleted_user")
 
 const Error = require('../utils/errors')
 
+const parseJWT = require('../utils/parseJWT')
 const createJWT = require('../utils/createJWT')
 const verifyGoogleToken = require('../utils/googleTokenVerifier')
 
 class AuthService {
 
-    static async login(email, googleToken, res) {
+    static async login(email, appleToken, googleToken, res) {
         const user = await User.findOne({email})
 
         if (!user) {
@@ -20,8 +21,17 @@ class AuthService {
             if (!isValidGoogleToken) {
                 return res.status(400).send(Error.invalidGoogleToken)
             }
+        } else if (appleToken) {
+            const payload = parseJWT(appleToken)
+            if ((payload.aud !== 'com.withligo.ligoapp-dev' && payload.aud !== 'com.withligo.ligoapp') || payload.email !== email) {
+                return res.status(400).send(Error.invalidAppleToken)
+            }
         } else {
             return res.status(400).send(Error.requiredToken)
+        }
+
+        if (user.isDeleted) {
+            await User.findByIdAndUpdate({_id: user._id}, {isDeleted: false})
         }
 
         user.token = createJWT(user._id)
@@ -42,10 +52,8 @@ class AuthService {
             {
                 _id: user._id
             }, {
-                name: user._id,
-                email: user._id,
+                email: user._id.toString(),
                 ratings: [],
-                phone: null,
                 token: null,
                 fcmTokens: [],
                 location: null,

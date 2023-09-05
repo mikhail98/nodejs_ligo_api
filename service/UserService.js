@@ -9,19 +9,29 @@ const Socket = require("../utils/socket")
 const createJWT = require("../utils/createJWT")
 const sendMessageToTelegramBot = require("../utils/telegram")
 const verifyGoogleToken = require("../utils/googleTokenVerifier")
+const parseJWT = require("../utils/parseJWT");
 
 class UserService {
 
-    static async createUser(name, email, phone, role, fcmToken, googleToken, res) {
+    static async createUser(name, email, phone, role, fcmToken, googleToken, appleToken, res) {
         const oldUser = await User.findOne({email})
 
         if (oldUser) {
             return res.status(400).send(Error.userExits)
         }
 
-        const isValidToken = await verifyGoogleToken(email, googleToken)
-        if (!isValidToken) {
-            return res.status(400).send(Error.invalidGoogleToken)
+        if (googleToken) {
+            const isValidGoogleToken = await verifyGoogleToken(email, googleToken)
+            if (!isValidGoogleToken) {
+                return res.status(400).send(Error.invalidGoogleToken)
+            }
+        } else if (appleToken) {
+            const payload = parseJWT(appleToken)
+            if ((payload.aud !== 'com.withligo.ligoapp-dev' && payload.aud !== 'com.withligo.ligoapp') || payload.email !== email) {
+                return res.status(400).send(Error.invalidAppleToken)
+            }
+        } else {
+            return res.status(400).send(Error.requiredToken)
         }
 
         let fcmTokens
@@ -52,7 +62,7 @@ class UserService {
 
     static async getUserExists(email, res) {
         const user = await User.findOne({email})
-        return res.status(200).send({userExists: user !== null})
+        return res.status(200).send({userExists: user !== null && user.isDeleted !== true})
     }
 
     static async updateFcmToken(user, fcmToken, res) {

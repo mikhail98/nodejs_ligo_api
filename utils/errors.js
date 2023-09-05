@@ -18,12 +18,15 @@ const notInYouTrip = createError(306, "This parcel is not in your trip")
 const parcelInActiveTrip = createError(307, "This parcel is in active trip")
 const provideTokenOrPassword = createError(308, "Provide token")
 const invalidGoogleToken = createError(309, "Invalid Google token")
+const invalidAppleToken = createError(310, "Invalid Apple token")
 
 const driverHasActiveTrip = createError(401, "Driver has active an trip")
 const pointsAreTheSame = createError(402, "startPoint can't be equal to endPoint")
 const ratingExists = createError(403, "Rating exists")
 
 const unknownError = createError(501, "Unknown error")
+
+const userNotInThisChat = createError(601, "User not in this chat")
 
 function createError(code, msg) {
     return {
@@ -54,5 +57,7 @@ module.exports = {
     searchRequestRequired,
     originAndDestinationRequired,
     invalidGoogleToken,
-    unknownError
+    unknownError,
+    userNotInThisChat,
+    invalidAppleToken
 }

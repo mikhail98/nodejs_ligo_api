@@ -6,6 +6,7 @@ const Error = require("../utils/errors")
 const Socket = require("../utils/socket")
 
 const ParcelStatues = require("../utils/config").ParcelStatues
+const ChatService = require("../service/ChatService")
 
 const sendPushNotifications = require("../utils/fcm")
 const sendMessageToTelegramBot = require("../utils/telegram")
@@ -74,6 +75,8 @@ class ParcelService {
             {new: true}
         )
             .populate("driver sender")
+
+        await ChatService.createChat(parcelId, driverId, parcel.sender._id)
 
         if (parcel) {
             const trip = await Trip.findOne({driver: driverId, status: {$in: ['ACTIVE', 'SCHEDULED']}})
