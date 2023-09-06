@@ -20,7 +20,7 @@ class ChatService {
     static async getChatForParcel(userId, parcelId, res) {
         const chat = await Chat.findOne({parcel: parcelId})
             .populate("parcel driver sender messages")
-            .populate({path: 'parcel', populate: {path: 'sender'}})
+            .populate({path: 'parcel', populate: {path: 'sender driver'}})
 
         const driverId = chat.driver._id.toString()
         const senderId = chat.sender._id.toString()
@@ -41,7 +41,7 @@ class ChatService {
                 {sender: userId}
             ]
         }).populate("parcel driver sender messages")
-            .populate({path: 'parcel', populate: {path: 'sender'}})
+            .populate({path: 'parcel', populate: {path: 'sender driver'}})
 
         chats.forEach(chat=>{
             chat.driver.fcmTokens = []
