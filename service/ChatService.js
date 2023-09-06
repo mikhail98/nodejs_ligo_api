@@ -43,7 +43,7 @@ class ChatService {
         }).populate("parcel driver sender messages")
             .populate({path: 'parcel', populate: {path: 'sender driver'}})
 
-        chats.forEach(chat=>{
+        chats.forEach(chat => {
             chat.driver.fcmTokens = []
             chat.sender.fcmTokens = []
             chat.parcel.sender.fcmTokens = []
@@ -78,6 +78,33 @@ class ChatService {
 
             return res.status(200).send()
         }
+    }
+
+    static async readMessages(userId, chatId, res) {
+        const chat = await Chat.findOne({_id: chatId}).populate("messages")
+
+        const driverId = chat.driver.toString()
+        const senderId = chat.sender.toString()
+
+        if (userId !== driverId && userId !== senderId) {
+            return res.status(400).send(Error.userNotInThisChat)
+        }
+
+        for await (const message of chat.messages) {
+            if (message.user.toString() !== userId.toString()) {
+                if (!message.isRead) {
+                    await Message.updateOne({_id: message._id}, {isRead: true})
+                }
+            }
+        }
+
+        if (userId === driverId) {
+            Socket.emitEvent(senderId, 'messagesWereRead', {chatId: chatId})
+        }
+        if (userId === senderId) {
+            Socket.emitEvent(driverId, 'messagesWereRead', {chatId: chatId})
+        }
+        return res.status(200).send()
     }
 }
 
