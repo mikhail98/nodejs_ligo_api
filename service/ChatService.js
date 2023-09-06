@@ -76,7 +76,7 @@ class ChatService {
                 Socket.emitEvent(driverId, 'newMessage', createdMessage)
             }
 
-            return res.status(200).send()
+            return res.status(200).send(createdMessage)
         }
     }
 
