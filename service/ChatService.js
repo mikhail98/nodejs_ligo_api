@@ -34,6 +34,23 @@ class ChatService {
         }
     }
 
+    static async getChatById(userId, chatId, res) {
+        const chat = await Chat.findOne({_id: chatId})
+            .populate("parcel driver sender messages")
+            .populate({path: 'parcel', populate: {path: 'sender driver'}})
+
+        const driverId = chat.driver._id.toString()
+        const senderId = chat.sender._id.toString()
+        if (userId !== driverId && userId !== senderId) {
+            return res.status(400).send(Error.userNotInThisChat)
+        } else {
+            chat.driver.fcmTokens = []
+            chat.sender.fcmTokens = []
+            chat.parcel.sender.fcmTokens = []
+            return res.status(200).send(chat)
+        }
+    }
+
     static async getChats(userId, res) {
         const chats = await Chat.find({
             $or: [
