@@ -47,6 +47,10 @@ class GoogleService {
         }
     }
 
+    static async getOnlyDirection(origin, destination) {
+        return GoogleDirection.findOne({origin, destination})
+    }
+
     static async getLocalization(isInstant, res) {
         let interval
         if (isInstant) {

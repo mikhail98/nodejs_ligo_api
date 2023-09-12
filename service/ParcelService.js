@@ -7,6 +7,7 @@ const Socket = require("../utils/socket")
 
 const ParcelStatues = require("../utils/config").ParcelStatues
 const ChatService = require("../service/ChatService")
+const GoogleService = require("../service/GoogleService")
 
 const sendPushNotifications = require("../utils/fcm")
 const sendMessageToTelegramBot = require("../utils/telegram")
@@ -225,7 +226,13 @@ class ParcelService {
         const parcelSecret = await Secret.findOne({parcelId})
         if (parcelSecret) {
             if (parcelSecret.secret === secret) {
-                const parcel = await Parcel.findOne({_id: parcelId}).populate("sender driver")
+                const parcel = (await Parcel.findOne({_id: parcelId}).populate("sender driver")).toObject()
+                const origin = parcel.startPoint.latitude.toString() + "," + parcel.startPoint.longitude.toString()
+                const destination = parcel.endPoint.latitude.toString() + "," + parcel.endPoint.longitude.toString()
+                const route = await GoogleService.getOnlyDirection(origin, destination)
+                if (route) {
+                    parcel.points = JSON.parse(route.response).points
+                }
                 return res.status(200).send(parcel)
             } else {
                 return res.status(400).send(Error.accessDenied)
