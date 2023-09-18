@@ -73,6 +73,8 @@ class ChatService {
         message.chat = chatId
         const createdMessage = await Message.create(message)
         const chat = await Chat.findOne({_id: chatId})
+            .populate("parcel driver sender")
+            .populate({path: 'parcel', populate: {path: 'sender driver'}})
 
         const driverId = chat.driver.toString()
         const senderId = chat.sender.toString()
