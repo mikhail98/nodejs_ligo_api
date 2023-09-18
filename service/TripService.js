@@ -34,7 +34,12 @@ class TripService {
                 const day = date.day
                 const month = date.month
                 const cronJob = cron.schedule(`${second} ${minute} ${hour} ${day} ${month} *`, async () => {
-                    await sendPushNotifications(user._id, {key: "START_TRIP_REMINDER", trip: trip})
+                    const route = trip.startPoint.cityName + " - " + trip.endPoint.cityName
+                    await sendPushNotifications(user._id, {
+                        key: "START_TRIP_REMINDER",
+                        tripId: trip._id,
+                        route: route
+                    })
                 }, {timezone: "Etc/GMT"})
 
                 cronList.push(new CronItem(cronJob, trip._id))

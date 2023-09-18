@@ -76,7 +76,14 @@ async function notifyDriver(driver, parcel) {
     }
     const driverId = driver._id.toString()
     Socket.emitEvent(driverId, "parcelAvailable", parcel)
-    await sendPushNotifications(driverId, {key: "PARCEL_AVAILABLE", parcel: parcel})
+
+    const route = parcel.startPoint.cityName + " - " + parcel.endPoint.cityName
+    await sendPushNotifications(driverId, {
+        key: "PARCEL_AVAILABLE",
+        parcelId: parcel._id,
+        senderId: parcel.sender._id,
+        route: route
+    })
 }
 
 function getDistanceBetween(point1, point2) {
