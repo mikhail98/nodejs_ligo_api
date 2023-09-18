@@ -90,7 +90,7 @@ class ParcelService {
 
             const senderId = parcel.sender._id.toString()
             Socket.emitEvent(senderId, 'parcelAccepted', parcel)
-            await sendPushNotifications(senderId, {key: "PARCEL_ACCEPTED", parcelId: parcelId})
+            await sendPushNotifications(senderId, {key: "PARCEL_ACCEPTED", parcel: parcel})
 
             return res.status(200).send(parcel)
         } else {
@@ -129,7 +129,7 @@ class ParcelService {
                 }
                 const senderId = parcel.sender._id.toString()
                 Socket.emitEvent(senderId, 'parcelPicked', parcel)
-                await sendPushNotifications(senderId, {key: "PARCEL_PICKED", parcelId: parcelId})
+                await sendPushNotifications(senderId, {key: "PARCEL_PICKED", parcel: parcel})
                 return res.status(200).send(parcel)
             } else {
                 return res.status(400).send(Error.notInYouTrip)
@@ -184,7 +184,7 @@ class ParcelService {
                 }
                 const senderId = parcel.sender._id.toString()
                 Socket.emitEvent(senderId, "parcelRejected", parcel)
-                await sendPushNotifications(senderId, {key: "PARCEL_REJECTED", parcelId: parcelId})
+                await sendPushNotifications(senderId, {key: "PARCEL_REJECTED", parcel: parcel})
                 return res.status(200).send(parcel)
             } else {
                 return res.status(400).send(Error.notInYouTrip)
@@ -211,7 +211,7 @@ class ParcelService {
                 }
                 const senderId = parcel.sender._id.toString()
                 Socket.emitEvent(senderId, "parcelDelivered", parcel)
-                await sendPushNotifications(senderId, {key: "PARCEL_DELIVERED", parcelId: parcelId})
+                await sendPushNotifications(senderId, {key: "PARCEL_DELIVERED", parcel: parcel})
 
                 return res.status(200).send(parcel)
             } else {

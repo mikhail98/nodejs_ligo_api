@@ -82,8 +82,8 @@ class ChatService {
         } else {
             chat.messages.push(createdMessage._id)
             await Chat.updateOne({_id: chatId}, chat)
-
-            const pushData = {key: 'NEW_MESSAGE', message: createdMessage}
+            chat.messages = []
+            const pushData = {key: 'NEW_MESSAGE', message: createdMessage, chat: chat}
             if (authorId === driverId) {
                 await sendPushNotifications(senderId, pushData)
                 Socket.emitEvent(senderId, 'newMessage', createdMessage)
