@@ -13,7 +13,7 @@ const sendPushNotifications = require("../utils/fcm")
 const sendMessageToTelegramBot = require("../utils/telegram")
 
 class ParcelService {
-    static async createParcel(user, startPoint, endPoint, types, weight, price, secret, res) {
+    static async createParcel(user, startPoint, endPoint, types, weight, price, secret, parcelPhoto, res) {
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
         }
@@ -23,6 +23,7 @@ class ParcelService {
             price: price,
             weight: weight,
             sender: user._id,
+            parcelPhoto: parcelPhoto,
             status: ParcelStatues.CREATED,
             endPoint: endPoint,
             notifiedDrivers: [],
@@ -37,7 +38,8 @@ class ParcelService {
             parcel.driver.fcmTokens = []
         }
 
-        const text = `New parcel!!! 📦📦📦%0A%0AId: ${parcel._id}%0ARoute: ${startPoint.cityName} -> ${endPoint.cityName}%0A%0A%23new_parcel`
+        const googleRoute = `https://www.google.com/maps/dir/${startPoint.latitude},${startPoint.longitude}/${endPoint.latitude},${endPoint.longitude}`
+        const text = `New parcel!!! 📦📦📦%0A%0AId: ${parcel._id}%0AWeight: ${parcel.weight}%0AReward: ${parcel.price.value} ${parcel.price.currency}%0ATypes: ${parcel.types}%0ASender name: ${parcel.sender.name}%0ASender email: ${parcel.sender.email}%0ASender phone: ${parcel.sender.phone}%0AFrom: ${startPoint.address}%0ATo: ${endPoint.address}%0A%0AGoogle route: ${googleRoute}%0A%23new_parcel`
         await sendMessageToTelegramBot(text)
 
         return res.status(200).send(parcel)

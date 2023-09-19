@@ -10,6 +10,7 @@ const parcelSchema = new mongoose.Schema({
     notifiedDrivers: [{type: String}],
     driversBlacklist: [{type: String}],
     price: {type: priceSchema, required: true},
+    parcelPhoto: {type: String, required: true},
     endPoint: {type: locationSchema, required: true},
     startPoint: {type: locationSchema, required: true},
     chatId: {type: mongoose.Schema.Types.ObjectId},
