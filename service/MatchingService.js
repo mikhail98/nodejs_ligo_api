@@ -43,6 +43,7 @@ async function requestDriversForParcels() {
 
 async function requestDriverForParcel(parcel, activeTrips) {
     const suitableDrivers = activeTrips
+        .filter(trip => trip.driver._id.toString() !== parcel.sender._id.toString())
         .filter(trip => trip.driver.location !== undefined)
         .filter(trip => trip.driver.location !== null)
         .filter(trip => {
