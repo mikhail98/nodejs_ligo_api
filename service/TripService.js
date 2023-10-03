@@ -24,6 +24,9 @@ class TripService {
                 status = 'ACTIVE'
             }
             let trip = await Trip.create({driver: user._id, startPoint, endPoint, status, parcels: []})
+            trip = await Trip.findOne({_id: trip._id}).populate("driver")
+            trip.driver.fcmTokens = []
+
             if (date) {
                 const second = date.second
                 const minute = date.minute
@@ -31,8 +34,11 @@ class TripService {
                 const day = date.day
                 const month = date.month
                 const cronJob = cron.schedule(`${second} ${minute} ${hour} ${day} ${month} *`, async () => {
+                    const route = trip.startPoint.cityName + " - " + trip.endPoint.cityName
                     await sendPushNotifications(user._id, {
-                        key: "START_TRIP_REMINDER", tripId: trip._id.toString()
+                        key: "START_TRIP_REMINDER",
+                        tripId: trip._id,
+                        route: route
                     })
                 }, {timezone: "Etc/GMT"})
 
@@ -42,8 +48,6 @@ class TripService {
             const text = `New trip!!! 🚗🚗🚗%0A%0AId: ${trip._id}%0ARoute: ${startPoint.cityName} -> ${endPoint.cityName}%0A%0A%23new_trip`
             await sendMessageToTelegramBot(text)
 
-            trip = await Trip.findOne({_id: trip._id}).populate("driver")
-            trip.driver.fcmTokens = []
             return res.status(200).send(trip)
         }
     }

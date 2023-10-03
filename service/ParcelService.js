@@ -7,12 +7,13 @@ const Socket = require("../utils/socket")
 
 const ParcelStatues = require("../utils/config").ParcelStatues
 const ChatService = require("../service/ChatService")
+const GoogleService = require("../service/GoogleService")
 
 const sendPushNotifications = require("../utils/fcm")
 const sendMessageToTelegramBot = require("../utils/telegram")
 
 class ParcelService {
-    static async createParcel(user, startPoint, endPoint, types, weight, price, secret, res) {
+    static async createParcel(user, startPoint, endPoint, types, weight, price, secret, parcelPhoto, res) {
         if (startPoint.latitude === endPoint.latitude && startPoint.longitude === endPoint.longitude) {
             return res.status(400).send(Error.pointsAreTheSame)
         }
@@ -22,6 +23,7 @@ class ParcelService {
             price: price,
             weight: weight,
             sender: user._id,
+            parcelPhoto: parcelPhoto,
             status: ParcelStatues.CREATED,
             endPoint: endPoint,
             notifiedDrivers: [],
@@ -36,7 +38,8 @@ class ParcelService {
             parcel.driver.fcmTokens = []
         }
 
-        const text = `New parcel!!! 📦📦📦%0A%0AId: ${parcel._id}%0ARoute: ${startPoint.cityName} -> ${endPoint.cityName}%0A%0A%23new_parcel`
+        const googleRoute = `https://www.google.com/maps/dir/${startPoint.latitude},${startPoint.longitude}/${endPoint.latitude},${endPoint.longitude}`
+        const text = `New parcel!!! 📦📦📦%0A%0AId: ${parcel._id}%0AWeight: ${parcel.weight}%0AReward: ${parcel.price.value} ${parcel.price.currency}%0ATypes: ${parcel.types}%0ASender name: ${parcel.sender.name}%0ASender email: ${parcel.sender.email}%0ASender phone: ${parcel.sender.phone}%0AFrom: ${startPoint.address}%0ATo: ${endPoint.address}%0A%0AGoogle route: ${googleRoute}%0A%23new_parcel`
         await sendMessageToTelegramBot(text)
 
         return res.status(200).send(parcel)
@@ -89,7 +92,7 @@ class ParcelService {
 
             const senderId = parcel.sender._id.toString()
             Socket.emitEvent(senderId, 'parcelAccepted', parcel)
-            await sendPushNotifications(senderId, {key: "PARCEL_ACCEPTED", parcelId: parcelId})
+            await sendPushNotifications(senderId, {key: "PARCEL_ACCEPTED", parcelId: parcel._id})
 
             return res.status(200).send(parcel)
         } else {
@@ -128,7 +131,7 @@ class ParcelService {
                 }
                 const senderId = parcel.sender._id.toString()
                 Socket.emitEvent(senderId, 'parcelPicked', parcel)
-                await sendPushNotifications(senderId, {key: "PARCEL_PICKED", parcelId: parcelId})
+                await sendPushNotifications(senderId, {key: "PARCEL_PICKED", parcelId: parcel._id})
                 return res.status(200).send(parcel)
             } else {
                 return res.status(400).send(Error.notInYouTrip)
@@ -183,7 +186,7 @@ class ParcelService {
                 }
                 const senderId = parcel.sender._id.toString()
                 Socket.emitEvent(senderId, "parcelRejected", parcel)
-                await sendPushNotifications(senderId, {key: "PARCEL_REJECTED", parcelId: parcelId})
+                await sendPushNotifications(senderId, {key: "PARCEL_REJECTED", parcelId: parcel._id})
                 return res.status(200).send(parcel)
             } else {
                 return res.status(400).send(Error.notInYouTrip)
@@ -210,7 +213,7 @@ class ParcelService {
                 }
                 const senderId = parcel.sender._id.toString()
                 Socket.emitEvent(senderId, "parcelDelivered", parcel)
-                await sendPushNotifications(senderId, {key: "PARCEL_DELIVERED", parcelId: parcelId})
+                await sendPushNotifications(senderId, {key: "PARCEL_DELIVERED", parcelId: parcel._id})
 
                 return res.status(200).send(parcel)
             } else {
@@ -225,7 +228,13 @@ class ParcelService {
         const parcelSecret = await Secret.findOne({parcelId})
         if (parcelSecret) {
             if (parcelSecret.secret === secret) {
-                const parcel = await Parcel.findOne({_id: parcelId}).populate("sender driver")
+                const parcel = (await Parcel.findOne({_id: parcelId}).populate("sender driver")).toObject()
+                const origin = parcel.startPoint.latitude.toString() + "," + parcel.startPoint.longitude.toString()
+                const destination = parcel.endPoint.latitude.toString() + "," + parcel.endPoint.longitude.toString()
+                const route = await GoogleService.getOnlyDirection(origin, destination)
+                if (route) {
+                    parcel.points = JSON.parse(route.response).points
+                }
                 return res.status(200).send(parcel)
             } else {
                 return res.status(400).send(Error.accessDenied)

@@ -38,4 +38,24 @@ router.get('/byParcel/:id', log, auth, async (req, res) => {
     }
 })
 
+router.get('/:id/readMessages', log, auth, async (req, res) => {
+    try {
+        const userId = req.user._id.toString()
+        return await ChatService.readMessages(userId, req.params.id, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
+})
+
+router.get('/:id', log, auth, async (req, res) => {
+    try {
+        const userId = req.user._id.toString()
+        return await ChatService.getChatById(userId, req.params.id, res)
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send(Error.unknownError)
+    }
+})
+
 module.exports = router

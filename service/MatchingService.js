@@ -43,6 +43,7 @@ async function requestDriversForParcels() {
 
 async function requestDriverForParcel(parcel, activeTrips) {
     const suitableDrivers = activeTrips
+        .filter(trip => trip.driver._id.toString() !== parcel.sender._id.toString())
         .filter(trip => trip.driver.location !== undefined)
         .filter(trip => trip.driver.location !== null)
         .filter(trip => {
@@ -76,7 +77,14 @@ async function notifyDriver(driver, parcel) {
     }
     const driverId = driver._id.toString()
     Socket.emitEvent(driverId, "parcelAvailable", parcel)
-    await sendPushNotifications(driverId, {key: "PARCEL_AVAILABLE", parcelId: parcel._id.toString()})
+
+    const route = parcel.startPoint.cityName + " - " + parcel.endPoint.cityName
+    await sendPushNotifications(driverId, {
+        key: "PARCEL_AVAILABLE",
+        parcelId: parcel._id,
+        senderId: parcel.sender._id,
+        route: route
+    })
 }
 
 function getDistanceBetween(point1, point2) {

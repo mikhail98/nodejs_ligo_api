@@ -4,9 +4,7 @@ const mongoose = require('mongoose')
 
 const attachmentSchema = new mongoose.Schema({
         type: {type: String, enum: ['PHOTO', 'VIDEO', 'AUDIO', 'LOCATION']},
-        photoUrl: {type: String},
-        videoUrl: {type: String},
-        audioUrl: {type: String},
+        mediaUrl: {type: String},
         location: {type: locationSchema},
     }
 )
