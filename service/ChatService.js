@@ -87,16 +87,21 @@ class ChatService {
                 .populate("parcel driver sender")
                 .populate({path: 'parcel', populate: {path: 'sender driver'}})
 
+            let author
+            if (authorId === driverId) {
+                author = chat.driver
+            }
+            if (authorId === senderId) {
+                author = chat.sender
+            }
+
             const pushData = {
                 key: 'NEW_MESSAGE',
                 message: createdMessage,
                 chat: {
                     _id: chatId,
-                    driverId: pushChat.driver._id,
-                    senderName: pushChat.sender.name,
-                    senderAvatar: pushChat.sender.avatarPhoto,
-                    driverName: pushChat.driver.name,
-                    driverAvatar: pushChat.driver.avatarPhoto,
+                    authorName: author.name,
+                    authorAvatar: author.avatarPhoto
                 }
             }
             if (authorId === driverId) {
