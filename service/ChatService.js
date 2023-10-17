@@ -83,16 +83,14 @@ class ChatService {
             chat.messages.push(createdMessage._id)
             await Chat.updateOne({_id: chatId}, chat)
 
-            const pushChat = await Chat.findOne({_id: chatId})
-                .populate("parcel driver sender")
-                .populate({path: 'parcel', populate: {path: 'sender driver'}})
-
-            let author
+            let author, receiver
             if (authorId === driverId) {
                 author = chat.driver
+                receiver = chat.sender
             }
             if (authorId === senderId) {
                 author = chat.sender
+                receiver = chat.driver
             }
 
             const pushData = {
@@ -104,14 +102,8 @@ class ChatService {
                     authorAvatar: author.avatarPhoto
                 }
             }
-            if (authorId === driverId) {
-                await sendPushNotifications(senderId, pushData)
-                Socket.emitEvent(senderId, 'newMessage', createdMessage)
-            }
-            if (authorId === senderId) {
-                await sendPushNotifications(driverId, pushData)
-                Socket.emitEvent(driverId, 'newMessage', createdMessage)
-            }
+            await sendPushNotifications(receiver._id.toString(), pushData)
+            Socket.emitEvent(receiver._id.toString(), 'newMessage', createdMessage)
 
             return res.status(200).send(createdMessage)
         }
