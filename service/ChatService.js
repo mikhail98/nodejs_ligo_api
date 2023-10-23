@@ -72,7 +72,7 @@ class ChatService {
         message.user = authorId
         message.chat = chatId
         const createdMessage = await Message.create(message)
-        const chat = await Chat.findOne({_id: chatId})
+        const chat = await Chat.findOne({_id: chatId}).populate("sender driver")
 
         const driverId = chat.driver.toString()
         const senderId = chat.sender.toString()
@@ -80,8 +80,9 @@ class ChatService {
         if (authorId !== driverId && authorId !== senderId) {
             return res.status(400).send(Error.userNotInThisChat)
         } else {
-            chat.messages.push(createdMessage._id)
-            await Chat.updateOne({_id: chatId}, chat)
+            const messages = chat.messages
+            messages.push(createdMessage._id)
+            await Chat.updateOne({_id: chatId}, {messages: messages})
 
             let author, receiver
             if (authorId === driverId) {
