@@ -74,8 +74,8 @@ class ChatService {
         const createdMessage = await Message.create(message)
         const chat = await Chat.findOne({_id: chatId}).populate("sender driver")
 
-        const driverId = chat.driver.toString()
-        const senderId = chat.sender.toString()
+        const driverId = chat.driver._id.toString()
+        const senderId = chat.sender._id.toString()
 
         if (authorId !== driverId && authorId !== senderId) {
             return res.status(400).send(Error.userNotInThisChat)
